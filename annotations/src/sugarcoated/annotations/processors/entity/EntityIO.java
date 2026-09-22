@@ -1,4 +1,4 @@
-package template.annotations.processors.entity;
+package sugarcoated.annotations.processors.entity;
 
 import arc.math.*;
 import arc.struct.*;
@@ -6,13 +6,11 @@ import arc.util.*;
 import com.squareup.javapoet.*;
 import mindustry.*;
 import mindustry.ctype.*;
-import template.annotations.Annotations.*;
-import template.annotations.processors.*;
-import template.annotations.processors.util.TypeIOResolver.*;
+import sugarcoated.annotations.Annotations.*;
+import sugarcoated.annotations.processors.*;
+import sugarcoated.annotations.processors.util.TypeIOResolver.*;
 
 import javax.lang.model.element.*;
-
-import static template.annotations.processors.BaseProcessor.*;
 
 public class EntityIO{
     final String name;

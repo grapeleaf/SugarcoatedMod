@@ -1,7 +1,7 @@
-template.annotations.processors.impl.AssetsProcessor
-template.annotations.processors.impl.LoadProcessor
-template.annotations.processors.impl.StructProcessor
-template.annotations.processors.impl.RegionsProcessor
-template.annotations.processors.entity.EntityProcessor
-template.annotations.processors.entity.MergeProcessor
-template.annotations.processors.entity.DupeProcessor
+sugarcoated.annotations.processors.impl.AssetsProcessor
+sugarcoated.annotations.processors.impl.LoadProcessor
+sugarcoated.annotations.processors.impl.StructProcessor
+sugarcoated.annotations.processors.impl.RegionsProcessor
+sugarcoated.annotations.processors.entity.EntityProcessor
+sugarcoated.annotations.processors.entity.MergeProcessor
+sugarcoated.annotations.processors.entity.DupeProcessor

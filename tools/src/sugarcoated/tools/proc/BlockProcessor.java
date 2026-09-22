@@ -1,4 +1,4 @@
-package template.tools.proc;
+package sugarcoated.tools.proc;
 
 import arc.files.*;
 import arc.graphics.*;
@@ -11,14 +11,14 @@ import mindustry.game.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.legacy.*;
-import template.*;
-import template.tools.GenAtlas.*;
-import template.tools.*;
+import sugarcoated.*;
+import sugarcoated.tools.GenAtlas.*;
+import sugarcoated.tools.*;
 
 import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
-import static template.tools.Tools.*;
+import static sugarcoated.tools.Tools.*;
 
 public class BlockProcessor implements Processor{
     public static final Pixmap layout = new Pixmap(Base64Coder.decode(
@@ -81,7 +81,7 @@ public class BlockProcessor implements Processor{
     @Override
     public void process(ExecutorService exec){
         // Standard Blocks
-        content.blocks().each(Template::isTemplate, block -> {
+        content.blocks().each(SugarcoatedMod::isTemplate, block -> {
             if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) return;
 
             submit(exec, block.name, () -> {
@@ -187,7 +187,7 @@ public class BlockProcessor implements Processor{
         });
 
         // Ore Blocks
-        content.blocks().each(Template::isTemplate, block -> {
+        content.blocks().each(SugarcoatedMod::isTemplate, block -> {
             if(!(block instanceof OreBlock ore)) return;
 
             submit(exec, ore.name + "-ore", () -> {
@@ -241,7 +241,7 @@ public class BlockProcessor implements Processor{
         });
 
         // Autotiles
-        content.blocks().each(Template::isTemplate, b -> {
+        content.blocks().each(SugarcoatedMod::isTemplate, b -> {
             boolean isAutotile = b instanceof Floor f && f.autotile;
             if(b instanceof StaticWall w && w.autotile)
                 isAutotile = true;

@@ -1,4 +1,4 @@
-package template.annotations.processors.entity;
+package sugarcoated.annotations.processors.entity;
 
 import arc.func.*;
 import arc.struct.*;
@@ -7,9 +7,9 @@ import arc.util.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
 import mindustry.gen.*;
-import template.annotations.Annotations.*;
-import template.annotations.processors.*;
-import template.annotations.processors.util.TypeIOResolver.*;
+import sugarcoated.annotations.Annotations.*;
+import sugarcoated.annotations.processors.*;
+import sugarcoated.annotations.processors.util.TypeIOResolver.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;

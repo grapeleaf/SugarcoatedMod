@@ -1,12 +1,12 @@
-package template.tools.proc;
+package sugarcoated.tools.proc;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
-import template.gen.*;
-import template.gen.Regions.*;
-import template.tools.*;
-import template.tools.GenAtlas.*;
+import sugarcoated.gen.*;
+import sugarcoated.gen.Regions.*;
+import sugarcoated.tools.*;
+import sugarcoated.tools.GenAtlas.*;
 
 import java.lang.invoke.*;
 import java.util.concurrent.*;

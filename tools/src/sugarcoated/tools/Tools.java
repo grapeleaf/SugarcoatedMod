@@ -1,4 +1,4 @@
-package template.tools;
+package sugarcoated.tools;
 
 import arc.*;
 import arc.assets.*;
@@ -18,9 +18,9 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
-import template.*;
-import template.gen.*;
-import template.tools.GenAtlas.*;
+import sugarcoated.*;
+import sugarcoated.gen.*;
+import sugarcoated.tools.GenAtlas.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -33,7 +33,7 @@ import static mindustry.Vars.*;
  * @author GlennFolker
  */
 public final class Tools{
-    public static Template thisMod;
+    public static SugarcoatedMod thisMod;
     public static LoadedMod mod;
     public static ModMeta meta;
 
@@ -81,13 +81,13 @@ public final class Tools{
         content = new ContentLoader();
         content.createBaseContent();
 
-        thisMod = new Template(true);
+        thisMod = new SugarcoatedMod(true);
 
         meta = new ModMeta(){{ name = System.getProperty("currentModName"); }};
         mod = new LoadedMod(null, null, thisMod, Tools.class.getClassLoader(), meta);
 
         Reflect.<Seq<LoadedMod>>get(Mods.class, mods, "mods").add(mod);
-        Reflect.<ObjectMap<Class<?>, ModMeta>>get(Mods.class, mods, "metas").put(Template.class, meta);
+        Reflect.<ObjectMap<Class<?>, ModMeta>>get(Mods.class, mods, "metas").put(SugarcoatedMod.class, meta);
 
         addRegions();
         atlas.clear = atlas.find("clear");

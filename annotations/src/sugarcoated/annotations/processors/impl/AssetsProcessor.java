@@ -1,4 +1,4 @@
-package template.annotations.processors.impl;
+package sugarcoated.annotations.processors.impl;
 
 import arc.*;
 import arc.audio.*;
@@ -13,7 +13,7 @@ import com.squareup.javapoet.*;
 import mindustry.*;
 import mindustry.ui.*;
 
-import template.annotations.processors.*;
+import sugarcoated.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;

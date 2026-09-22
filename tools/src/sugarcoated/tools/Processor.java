@@ -1,4 +1,4 @@
-package template.tools;
+package sugarcoated.tools;
 
 import arc.util.*;
 

@@ -1,4 +1,4 @@
-package template.annotations.processors;
+package sugarcoated.annotations.processors;
 
 import arc.files.*;
 import arc.struct.*;
@@ -10,7 +10,7 @@ import com.sun.tools.javac.code.Attribute.*;
 import com.sun.tools.javac.model.*;
 import com.sun.tools.javac.processing.*;
 import mindustry.*;
-import template.annotations.Annotations.AnnotationProxyMaker;
+import sugarcoated.annotations.Annotations.AnnotationProxyMaker;
 
 import javax.annotation.processing.*;
 import javax.lang.model.*;

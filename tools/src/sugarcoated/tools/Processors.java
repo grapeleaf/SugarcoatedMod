@@ -1,7 +1,7 @@
-package template.tools;
+package sugarcoated.tools;
 
 import arc.util.*;
-import template.tools.proc.*;
+import sugarcoated.tools.proc.*;
 
 import java.util.concurrent.*;
 

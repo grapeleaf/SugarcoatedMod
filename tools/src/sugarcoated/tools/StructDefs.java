@@ -1,9 +1,9 @@
-package template.tools;
+package sugarcoated.tools;
 
 import arc.graphics.*;
 import arc.math.geom.*;
-import template.annotations.Annotations.*;
-import template.annotations.Annotations.StructField.*;
+import sugarcoated.annotations.Annotations.*;
+import sugarcoated.annotations.Annotations.StructField.*;
 
 @SuppressWarnings("all")
 final class StructDefs{

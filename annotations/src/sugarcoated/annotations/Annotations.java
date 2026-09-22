@@ -1,4 +1,4 @@
-package template.annotations;
+package sugarcoated.annotations;
 
 import arc.func.*;
 import arc.graphics.g2d.*;
@@ -19,7 +19,7 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.*;
 import mindustry.world.*;
 import sun.reflect.annotation.*;
-import template.annotations.processors.*;
+import sugarcoated.annotations.processors.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;

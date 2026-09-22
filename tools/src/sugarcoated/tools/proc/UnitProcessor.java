@@ -1,4 +1,4 @@
-package template.tools.proc;
+package sugarcoated.tools.proc;
 
 import arc.func.*;
 import arc.graphics.*;
@@ -12,14 +12,14 @@ import arc.util.noise.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
-import template.*;
-import template.tools.*;
-import template.tools.GenAtlas.*;
+import sugarcoated.*;
+import sugarcoated.tools.*;
+import sugarcoated.tools.GenAtlas.*;
 
 import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
-import static template.tools.Tools.*;
+import static sugarcoated.tools.Tools.*;
 
 /**
  * A processor to generate unit sprites such as:
@@ -135,7 +135,7 @@ public class UnitProcessor implements Processor{
 
     @Override
     public void process(ExecutorService exec){
-        content.units().each(Template::isTemplate, (UnitType type) -> submit(exec, type.name, () -> {
+        content.units().each(SugarcoatedMod::isTemplate, (UnitType type) -> submit(exec, type.name, () -> {
             Pixmap unitOutlinePixmap = null;
             Pixmap compositeIcon = null;
 

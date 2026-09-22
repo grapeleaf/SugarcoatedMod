@@ -1,4 +1,4 @@
-package template;
+package sugarcoated;
 
 import arc.*;
 import arc.util.*;
@@ -6,8 +6,8 @@ import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
-import template.annotations.Annotations.*;
-import template.gen.*;
+import sugarcoated.annotations.Annotations.*;
+import sugarcoated.gen.*;
 
 import static mindustry.Vars.*;
 
@@ -17,11 +17,11 @@ import static mindustry.Vars.*;
  */
 @LoadRegs("error")// Need this temporarily, so the class gets generated.
 @EnsureLoad
-public class Template extends Mod{
+public class SugarcoatedMod extends Mod{
     public static boolean tools = false;
 
     /** Default constructor for Mindustry mod loader to instantiate. */
-    public Template(){
+    public SugarcoatedMod(){
         this(false);
     }
 
@@ -29,8 +29,8 @@ public class Template extends Mod{
      * Constructs the mod, and binds some functionality to the game under certain circumstances.
      * @param tools Whether the mod is in an asset-processing context.
      */
-    public Template(boolean tools){
-        Template.tools = tools;
+    public SugarcoatedMod(boolean tools){
+        SugarcoatedMod.tools = tools;
 
         if(!headless){
             Events.on(FileTreeInitEvent.class, e -> Core.app.post(TemplateSounds::load));
@@ -71,6 +71,6 @@ public class Template extends Mod{
     }
 
     public static boolean isTemplate(Content content){
-        return content.minfo.mod != null && content.minfo.mod.name.equals("template");
+        return content.minfo.mod != null && content.minfo.mod.name.equals("sugarcoated");
     }
 }

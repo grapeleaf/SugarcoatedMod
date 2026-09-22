@@ -1,11 +1,11 @@
 {
-    "name": "template",
-    "displayName": "Template",
-    "author": "Someone",
+    "name": "sugarcoated",
+    "displayName": "Sugarcoated",
+    "author": "GrapeLeaf",
     "description": "No description provided",
-    "version": "1.0",
+    "version": "0.0.1a",
     "minGameVersion": 160.5,
-    "main": "template.Template",
+    "main": "sugarcoated.SugarcoatedMod",
     "java": true,
     "hideBrowser": true
 }

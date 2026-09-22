@@ -1,12 +1,12 @@
-package template.annotations.processors.impl;
+package sugarcoated.annotations.processors.impl;
 
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import com.squareup.javapoet.*;
 import mindustry.ctype.*;
-import template.annotations.Annotations.*;
-import template.annotations.processors.*;
+import sugarcoated.annotations.Annotations.*;
+import sugarcoated.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;

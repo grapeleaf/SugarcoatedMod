@@ -1,14 +1,14 @@
-package template.annotations.processors.util;
+package sugarcoated.annotations.processors.util;
 
 import arc.struct.*;
 import com.squareup.javapoet.*;
 import mindustry.io.*;
-import template.annotations.processors.*;
+import sugarcoated.annotations.processors.*;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 
-import static template.annotations.processors.BaseProcessor.*;
+import static sugarcoated.annotations.processors.BaseProcessor.*;
 
 /**
  * @author Anuke

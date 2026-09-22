@@ -1,13 +1,13 @@
-package template.annotations.processors.impl;
+package sugarcoated.annotations.processors.impl;
 
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.*;
 import com.squareup.javapoet.*;
 import com.sun.source.tree.*;
-import template.annotations.Annotations.*;
-import template.annotations.Annotations.StructField.*;
-import template.annotations.processors.*;
+import sugarcoated.annotations.Annotations.*;
+import sugarcoated.annotations.Annotations.StructField.*;
+import sugarcoated.annotations.processors.*;
 
 import javax.annotation.processing.*;
 import javax.lang.model.element.*;

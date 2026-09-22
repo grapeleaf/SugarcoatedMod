@@ -1,11 +1,11 @@
-package template.tools;
+package sugarcoated.tools;
 
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 
-import static template.tools.Tools.*;
+import static sugarcoated.tools.Tools.*;
 
 /**
  * A specialized thread-safe texture atlas for generated texture regions. No {@link Texture}s are instantiated; use
