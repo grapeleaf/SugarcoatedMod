@@ -230,7 +230,7 @@ public final class Tools{
             boolean should = loaded[content.getContentType().ordinal()].add(content.id);
             if(should){
                 content.load();
-                if (content instanceof MappableContent c) TemplateContentRegionRegistry.load(c);
+                if (content instanceof MappableContent c) SCContentRegionRegistry.load(c);
             }
 
             return should;

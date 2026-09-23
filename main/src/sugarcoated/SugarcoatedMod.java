@@ -7,6 +7,10 @@ import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
 import sugarcoated.annotations.Annotations.*;
+import sugarcoated.content.SCBlocks;
+import sugarcoated.content.SCItems;
+import sugarcoated.content.SCStatusEffects;
+import sugarcoated.content.SCUnitTypes;
 import sugarcoated.gen.*;
 
 import static mindustry.Vars.*;
@@ -33,7 +37,7 @@ public class SugarcoatedMod extends Mod{
         SugarcoatedMod.tools = tools;
 
         if(!headless){
-            Events.on(FileTreeInitEvent.class, e -> Core.app.post(TemplateSounds::load));
+            Events.on(FileTreeInitEvent.class, e -> Core.app.post(SCSounds::load));
 
             Events.on(ClientLoadEvent.class, e -> {
                 //show dialog upon startup
@@ -41,7 +45,7 @@ public class SugarcoatedMod extends Mod{
                     BaseDialog dialog = new BaseDialog("@cat");
                     dialog.cont.add("@behold").row();
                     //mod sprites are prefixed with the mod name (this mod is called 'example' in its config)
-                    dialog.cont.image(Core.atlas.find("template-cat")).pad(20f).row();
+                    dialog.cont.image(Core.atlas.find("sugarcoated-cat")).pad(20f).row();
                     dialog.cont.button("@cool", dialog::hide).size(100f, 50f);
                     dialog.show();
                 });
@@ -52,8 +56,8 @@ public class SugarcoatedMod extends Mod{
             if(!headless){
                 Regions.load();
                 content.each(content -> {
-                    if(isTemplate(content) && content instanceof MappableContent mContent){
-                        TemplateContentRegionRegistry.load(mContent);
+                    if(isSugarcoated(content) && content instanceof MappableContent mContent){
+                        SCContentRegionRegistry.load(mContent);
                     }
                 });
             }
@@ -61,16 +65,21 @@ public class SugarcoatedMod extends Mod{
     }
 
     @Override
-    public void init(){
-    }
-
-    @Override
     public void loadContent(){
+        SCSounds.load();
+
+        SCStatusEffects.load();
+
+        SCItems.load();
+        SCUnitTypes.load();
+
+        SCBlocks.load();
+
         //below has to be done after all things are loaded.
-        TemplateEntityMapping.init();
+        SCEntityMapping.init();
     }
 
-    public static boolean isTemplate(Content content){
+    public static boolean isSugarcoated(Content content){
         return content.minfo.mod != null && content.minfo.mod.name.equals("sugarcoated");
     }
 }

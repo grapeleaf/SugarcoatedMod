@@ -81,7 +81,7 @@ public class BlockProcessor implements Processor{
     @Override
     public void process(ExecutorService exec){
         // Standard Blocks
-        content.blocks().each(SugarcoatedMod::isTemplate, block -> {
+        content.blocks().each(SugarcoatedMod::isSugarcoated, block -> {
             if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) return;
 
             submit(exec, block.name, () -> {
@@ -187,7 +187,7 @@ public class BlockProcessor implements Processor{
         });
 
         // Ore Blocks
-        content.blocks().each(SugarcoatedMod::isTemplate, block -> {
+        content.blocks().each(SugarcoatedMod::isSugarcoated, block -> {
             if(!(block instanceof OreBlock ore)) return;
 
             submit(exec, ore.name + "-ore", () -> {
@@ -241,7 +241,7 @@ public class BlockProcessor implements Processor{
         });
 
         // Autotiles
-        content.blocks().each(SugarcoatedMod::isTemplate, b -> {
+        content.blocks().each(SugarcoatedMod::isSugarcoated, b -> {
             boolean isAutotile = b instanceof Floor f && f.autotile;
             if(b instanceof StaticWall w && w.autotile)
                 isAutotile = true;

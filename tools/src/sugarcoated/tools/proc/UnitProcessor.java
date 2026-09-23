@@ -135,7 +135,7 @@ public class UnitProcessor implements Processor{
 
     @Override
     public void process(ExecutorService exec){
-        content.units().each(SugarcoatedMod::isTemplate, (UnitType type) -> submit(exec, type.name, () -> {
+        content.units().each(SugarcoatedMod::isSugarcoated, (UnitType type) -> submit(exec, type.name, () -> {
             Pixmap unitOutlinePixmap = null;
             Pixmap compositeIcon = null;
 

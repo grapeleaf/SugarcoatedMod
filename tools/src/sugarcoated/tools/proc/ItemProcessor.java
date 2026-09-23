@@ -20,7 +20,7 @@ public class ItemProcessor implements Processor{
     @Override
     public void process(ExecutorService exec){
         // Items
-        content.items().each(SugarcoatedMod::isTemplate, item -> submit(exec, item.name + "-ui", () -> {
+        content.items().each(SugarcoatedMod::isSugarcoated, item -> submit(exec, item.name + "-ui", () -> {
             GenRegion baseRegion = atlas.find(item.name);
             if(!baseRegion.found()) return;
 
@@ -33,7 +33,7 @@ public class ItemProcessor implements Processor{
         }));
 
         // Liquids
-        content.liquids().each(SugarcoatedMod::isTemplate, liquid -> submit(exec, liquid.name + "-ui", () -> {
+        content.liquids().each(SugarcoatedMod::isSugarcoated, liquid -> submit(exec, liquid.name + "-ui", () -> {
             GenRegion baseRegion = atlas.find(liquid.name);
             if(!baseRegion.found()) return;
 
@@ -46,7 +46,7 @@ public class ItemProcessor implements Processor{
         }));
 
         // Status Effects
-        content.statusEffects().each(SugarcoatedMod::isTemplate, effect -> submit(exec, effect.name + "-ui", () -> {
+        content.statusEffects().each(SugarcoatedMod::isSugarcoated, effect -> submit(exec, effect.name + "-ui", () -> {
             GenRegion baseRegion = atlas.find(effect.name);
             if(!baseRegion.found()){
                 Log.warn("Base region not found for status effect '@'. Skipping.", effect.name);
