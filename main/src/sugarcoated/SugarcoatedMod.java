@@ -3,9 +3,12 @@ package sugarcoated;
 import arc.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.ui.dialogs.*;
+import sugarcoated.ai.SCCreatureAI;
 import sugarcoated.annotations.Annotations.*;
 import sugarcoated.content.SCBlocks;
 import sugarcoated.content.SCItems;
@@ -38,19 +41,17 @@ public class SugarcoatedMod extends Mod{
 
         if(!headless){
             Events.on(FileTreeInitEvent.class, e -> Core.app.post(SCSounds::load));
-
-            Events.on(ClientLoadEvent.class, e -> {
-                //show dialog upon startup
-                Time.runTask(10f, () -> {
-                    BaseDialog dialog = new BaseDialog("@cat");
-                    dialog.cont.add("@behold").row();
-                    //mod sprites are prefixed with the mod name (this mod is called 'example' in its config)
-                    dialog.cont.image(Core.atlas.find("sugarcoated-cat")).pad(20f).row();
-                    dialog.cont.button("@cool", dialog::hide).size(100f, 50f);
-                    dialog.show();
-                });
-            });
         }
+
+        Events.run(EventType.Trigger.draw, () -> {
+            if(!SCCreatureAI.debugView || headless) return;
+
+            Groups.unit.each(unit -> {
+                if(unit.controller() instanceof SCCreatureAI ai){
+                    ai.drawDebug();
+                }
+            });
+        });
 
         Events.on(ContentInitEvent.class, e -> {
             if(!headless){

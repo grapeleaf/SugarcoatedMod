@@ -15,7 +15,7 @@ public class SCCreatureUnitType extends SCUnitType {
     /** This creatures max change range, can be overridden by setting a value of >0*/
     public float chaseRange = -1f,
     /** How long this creature will chase for until it loses interest*/
-    chaseTimer = 160f;
+    chaseTimer = 300f;
 
     //strafing
 
@@ -25,6 +25,8 @@ public class SCCreatureUnitType extends SCUnitType {
     public float strafeTimeMin = 30f,
     /** Max strafe time */
     strafeTimeMax = 90f,
+    /** The angle around the target of which this creature is allowed to strafe across*/
+    strafeAngle = 45f,
     /** Max strafing distance for this creature, can be overridden by setting a value of >0*/
     strafeDistMax = -1f,
     /** Strafe offset for this creature (e.g. if this is 24, creature can randomly move 4 tiles closer to the target)*/
@@ -65,7 +67,7 @@ public class SCCreatureUnitType extends SCUnitType {
             for(Weapon weapon : weapons){
                 if(!weapon.useAttackRange) continue;
 
-                chaseRange = Math.max(range, weapon.range() - margin) * 2f;
+                chaseRange = Math.max(range, weapon.range() - margin) * 1.5f;
             }
         }
     }

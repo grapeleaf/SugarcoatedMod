@@ -48,7 +48,7 @@ public class SCUnitTypes {
             armor = 6;
 
             speed = 1.1f;
-            drag = 0.2f;
+            drag = 0.08f;
 
             hitSize = 12;
             rotateSpeed = 5;
@@ -58,7 +58,6 @@ public class SCUnitTypes {
             alertRadius = 16f * 8f;
 
             terrainWalk = false;
-            targetAir = true;
 
             wanderTimeMin = 60f;
             wanderTimeMax = 300f;
@@ -181,7 +180,7 @@ public class SCUnitTypes {
             armor = 4;
 
             speed = 1f;
-            drag = 0.2f;
+            drag = 0.08f;
 
             hitSize = 12;
             rotateSpeed = 5;
@@ -191,7 +190,6 @@ public class SCUnitTypes {
             alertRadius = 20f * 8f;
 
             terrainWalk = false;
-            targetAir = true;
 
             wanderTimeMin = 100f;
             wanderTimeMax = 350f;
@@ -319,10 +317,10 @@ public class SCUnitTypes {
 
             //Stat
             health = 5000;
-            armor = 10;
+            armor = 5;
 
             speed = 0.8f;
-            drag = 0.2f;
+            drag = 0.04f;
 
             hitSize = 17.5f;
             rotateSpeed = 2;
@@ -332,7 +330,12 @@ public class SCUnitTypes {
             alertRadius = 35f * 8f;
 
             terrainWalk = true;
-            targetAir = true;
+
+            strafeAngle = 90f;
+            strafeDistMax = 15f * 8f;
+            strafeOffs = 7f * 8f;
+            strafeTimeMin = 60f;
+            strafeTimeMax = 120f;
 
             wanderTimeMin = 180f;
             wanderTimeMax = 480;
@@ -351,7 +354,7 @@ public class SCUnitTypes {
             legExtension = -15f;
             legBaseOffset = 7.5f;
             legLengthScl = 0.95f;
-            legForwardScl = 1.1f;
+            legForwardScl = 1.4f;
             legMoveSpace = 0.3f;
             legStraightLength = 1f;
             legMaxLength = 1.1f;
@@ -372,158 +375,158 @@ public class SCUnitTypes {
 
             groundLayer = Layer.legUnit;
             abilities.add(
-                    new SCSpawnDeathAbility(babyPepper, 12, 80f){{
-                        appliedEffect = SCStatusEffects.speedy;
-                        effectDuration = 360f;
+                new SCSpawnDeathAbility(babyPepper, 8, 80f){{
+                    appliedEffect = SCStatusEffects.speedy;
+                    effectDuration = 360f;
 
-                        faceOutwards = true;
-                        randAmount = 10;
-                    }},
-                    new SCSpawnDeathAbility(babyMint, 8, 80f){{
-                        appliedEffect = SCStatusEffects.speedy;
-                        effectDuration = 360f;
+                    faceOutwards = true;
+                    randAmount = 5;
+                }},
+                new SCSpawnDeathAbility(babyMint, 5, 80f){{
+                    appliedEffect = SCStatusEffects.speedy;
+                    effectDuration = 360f;
 
-                        faceOutwards = true;
-                        randAmount = 8;
-                    }}
-
+                    faceOutwards = true;
+                    randAmount = 3;
+                }}
             );
 
             parts.add(
-                    new RegionPart("-fang"){{
-                        layerOffset = -0.001f;
-                        mirror = true;
+                new RegionPart("-fang"){{
+                    layerOffset = -0.001f;
+                    mirror = true;
 
-                        y = 2f;
+                    y = 2f;
 
-                        moveRot = 9f;
-                        progress = p -> Mathf.absin(Time.time + 12f, 20f, 1f);
+                    moveRot = 9f;
+                    progress = p -> Mathf.absin(Time.time + 12f, 20f, 1f);
 
-                        moves.add(new PartMove(p -> Mathf.absin(Time.time + 14f, 15f, 1f), -1f, -1f, 0f));
-                    }}
+                    moves.add(new PartMove(p -> Mathf.absin(Time.time + 14f, 15f, 1f), -1f, -1f, 0f));
+                }}
             );
 
             weapons.addAll(
-                    new Weapon(){{
-                        mirror = true;
-                        alternate = false;
+                new Weapon(){{
+                    mirror = true;
+                    alternate = false;
 
-                        x = 12f;
-                        y = -1f;
-                        baseRotation = -90f;
-                        shootCone = 360f;
+                    x = 12f;
+                    y = -1f;
+                    baseRotation = -90f;
+                    shootCone = 190f;
 
-                        reload = 45f;
+                    reload = 45f;
 
-                        shootSound = SCSounds.shootMagic;
-                        shootSoundVolume = 0.7f;
-                        shoot = new ShootSpread(4, 7f){{
-                            shotDelay = 4f;
-                        }};
-                        bullet = new BasicBulletType(){{
-                            shootEffect = Fx.none;
-                            smokeEffect = Fx.none;
+                    shootSound = SCSounds.shootMagic;
+                    shootSoundVolume = 0.7f;
+                    shoot = new ShootSpread(4, 7f){{
+                        shotDelay = 4f;
+                    }};
+                    bullet = new BasicBulletType(){{
+                        shootEffect = Fx.none;
+                        smokeEffect = Fx.none;
 
-                            hitSound = despawnSound = SCSounds.explosionMagic;
+                        hitSound = despawnSound = SCSounds.explosionMagic;
 
-                            speed = 9f;
-                            damage = 35f;
-                            lifetime = 45;
+                        speed = 9f;
+                        damage = 35f;
+                        lifetime = 45;
+                        drag = -0.015f;
 
-                            homingPower = 0.3f;
-                            homingDelay = 4f;
+                        homingPower = 0.26f;
+                        homingDelay = 4f;
 
-                            width = 8f;
-                            height = 12f;
+                        width = 8f;
+                        height = 12f;
 
-                            lightColor = hitColor = CandyPal.redMint;
-                            frontColor = Color.white;
+                        lightColor = hitColor = CandyPal.redMint;
+                        frontColor = Color.white;
 
-                            trailWidth = 2f;
-                            trailLength = 12;
-                            trailColor = lightColor;
+                        trailWidth = 2f;
+                        trailLength = 12;
+                        trailColor = lightColor;
 
-                            shrinkY = 0f;
-                            shrinkX = 0f;
-                        }};
-                    }},
+                        shrinkY = 0f;
+                        shrinkX = 0f;
+                    }};
+                }},
 
-                    new Weapon(){{
-                        x = 0f;
-                        y = 0f;
+                new Weapon(){{
+                    x = 0f;
+                    y = 0f;
 
-                        reload = 250f;
-                        rotate = false;
+                    reload = 250f;
+                    rotate = false;
 
-                        shootY = 12f;
-                        shootCone = 45f;
+                    shootY = 12f;
+                    shootCone = 45f;
 
-                        shootSound = SCSounds.shootMagicLarge;
-                        shootSoundVolume = 0.7f;
-                        bullet = new BulletType(){{
-                           shootEffect = new Effect(20, e -> {
-                               color(Color.white, e.color, e.fin());
-                               stroke(0.8f + e.fout());
-                               Lines.square(e.x, e.y, e.fin() * 60f, 45f);
-                               Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
-                           });
-                           smokeEffect = new Effect(45f, e -> {
-                               rand.setSeed(e.id);
-                               for(int i = 0; i < 15; i++){
-                                 v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
-                                 e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
-                                     color(e.color, Pal.lightishGray, b.fin());
-                                     Fill.square(e.x +v.x, e.y + v.y, b.fout() * 3.4f + 0.8f, 45f);
-                                 });
-                               }
-                           });
+                    shootSound = SCSounds.shootMagicLarge;
+                    shootSoundVolume = 0.7f;
+                    bullet = new BulletType(){{
+                       shootEffect = new Effect(20, e -> {
+                           color(Color.white, e.color, e.fin());
+                           stroke(0.8f + e.fout());
+                           Lines.square(e.x, e.y, e.fin() * 60f, 45f);
+                           Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
+                       });
+                       smokeEffect = new Effect(45f, e -> {
+                           rand.setSeed(e.id);
+                           for(int i = 0; i < 15; i++){
+                             v.trns(e.rotation + rand.range(30f), rand.random(e.finpow() * 40f));
+                             e.scaled(e.lifetime * rand.random(0.3f, 1f), b -> {
+                                 color(e.color, Pal.lightishGray, b.fin());
+                                 Fill.square(e.x +v.x, e.y + v.y, b.fout() * 3.4f + 0.8f, 45f);
+                             });
+                           }
+                       });
 
-                           hitColor = CandyPal.redMint;
-                           shake = 4f;
-                           speed = 0f;
-                           keepVelocity = false;
+                       hitColor = CandyPal.redMint;
+                       shake = 4f;
+                       speed = 0f;
+                       keepVelocity = false;
 
-                           spawnUnit = new MissileUnitType("sweet-mother-missile"){{
-                               health = 200;
-                               speed = 4f;
-                               rotateSpeed = 0f;
+                       spawnUnit = new MissileUnitType("sweet-mother-missile"){{
+                           health = 200;
+                           speed = 4f;
+                           rotateSpeed = 0f;
 
-                               lifetime = 60f * 1.3f;
-                               maxRange = 6f;
+                           lifetime = 60f * 1.3f;
+                           maxRange = 6f;
 
-                               useUnitCap = false;
+                           useUnitCap = false;
 
-                               trailColor = engineColor = CandyPal.redMint;
-                               outlineColor = CandyPal.redMintOutline;
+                           trailColor = engineColor = CandyPal.redMint;
+                           outlineColor = CandyPal.redMintOutline;
 
-                               engineSize = 6f;
-                               drawCell = false;
+                           engineSize = 6f;
+                           drawCell = false;
 
-                               weapons.add(
-                                       new Weapon(){{
-                                           shootSound = SCSounds.explosionMagicLarge;
-                                           shootSoundVolume = 1.5f;
+                           weapons.add(
+                               new Weapon(){{
+                                   shootSound = SCSounds.explosionMagicLarge;
+                                   shootSoundVolume = 1.5f;
 
-                                           shootCone = 350f;
-                                           mirror = false;
-                                           reload = 1f;
+                                   shootCone = 350f;
+                                   mirror = false;
+                                   reload = 1f;
 
-                                           shootOnDeath = true;
-                                           shootOnDeathEffect = Fx.massiveExplosion;
+                                   shootOnDeath = true;
+                                   shootOnDeathEffect = Fx.massiveExplosion;
 
-                                           bullet = new ExplosionBulletType(300f, 50f){{
-                                               despawnEffect = shootEffect = new WaveEffect(){{
-                                                   colorFrom = colorTo = CandyPal.redMint;
-                                                   sizeTo = 40f;
-                                                   lifetime = 15f;
-                                                   strokeFrom = 4f;
-                                               }};
-                                           }};
-                                       }}
-                               );
-                           }};
-                        }};
-                    }}
+                                   bullet = new ExplosionBulletType(300f, 60f){{
+                                       despawnEffect = shootEffect = new WaveEffect(){{
+                                           colorFrom = colorTo = CandyPal.redMint;
+                                           sizeTo = 40f;
+                                           lifetime = 15f;
+                                           strokeFrom = 4f;
+                                       }};
+                                   }};
+                               }}
+                           );
+                       }};
+                    }};
+                }}
             );
         }};
     }
