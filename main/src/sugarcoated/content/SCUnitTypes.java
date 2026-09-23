@@ -425,12 +425,24 @@ public class SCUnitTypes {
                     bullet = new BasicBulletType(){{
                         shootEffect = Fx.none;
                         smokeEffect = Fx.none;
+                        hitEffect = despawnEffect = new ExplosionEffect(){{
+                            lifetime = 22f;
+                            waveStroke = 0f;
+                            waveRad = 0f;
+                            smokeSize = 0f;
 
+                            sparks = 6;
+                            sparkRad = 24f;
+                            sparkLen = 8f;
+                            sparkStroke = 3.5f;
+
+                            sparkColor = CandyPal.redMint;
+                        }};
                         hitSound = despawnSound = SCSounds.explosionMagic;
 
                         speed = 9f;
                         damage = 35f;
-                        lifetime = 45;
+                        lifetime = 30f;
                         drag = -0.015f;
 
                         homingPower = 0.26f;
@@ -458,7 +470,7 @@ public class SCUnitTypes {
                     reload = 250f;
                     rotate = false;
 
-                    shootY = 12f;
+                    shootY = 17f;
                     shootCone = 45f;
 
                     shootSound = SCSounds.shootMagicLarge;
@@ -502,6 +514,26 @@ public class SCUnitTypes {
                            engineSize = 6f;
                            drawCell = false;
 
+                           deathExplosionEffect = new ExplosionEffect(){{
+                               lifetime = 25f;
+
+                               waveLife = 15f;
+                               waveStroke = 4f;
+                               waveRad = 40f;
+
+                               smokes = 4;
+                               smokeSize = 8f;
+                               smokeRad = 30f;
+                               smokeColor = Color.white;
+
+                               sparks = 7;
+                               sparkRad = 40f;
+                               sparkLen = 9f;
+                               sparkStroke = 4f;
+
+                               waveColor = sparkColor = CandyPal.redMint;
+                           }};
+
                            weapons.add(
                                new Weapon(){{
                                    shootSound = SCSounds.explosionMagicLarge;
@@ -520,6 +552,59 @@ public class SCUnitTypes {
                                            sizeTo = 40f;
                                            lifetime = 15f;
                                            strokeFrom = 4f;
+                                       }};
+                                       despawnShake = 7f;
+
+                                       fragBullets = 5;
+                                       fragVelocityMin = 0.4f;
+                                       fragRandomSpread = 175f;
+                                       fragLifeMin = 0.5f;
+                                       fragBullet = new BasicBulletType(){{
+                                           shootEffect = Fx.none;
+                                           smokeEffect = Fx.none;
+
+                                           hitEffect = despawnEffect = new ExplosionEffect(){{
+                                               lifetime = 20f;
+                                               waveStroke = 0f;
+                                               waveRad = 0f;
+
+                                               smokes = 4;
+                                               smokeSize = 8f;
+                                               smokeRad = 30f;
+                                               smokeColor = Color.white;
+
+                                               sparks = 7;
+                                               sparkRad = 40f;
+                                               sparkLen = 9f;
+                                               sparkStroke = 4f;
+
+                                               sparkColor = CandyPal.redMint;
+                                           }};
+
+                                           hitSound = despawnSound = SCSounds.explosionMagic;
+
+                                           speed = 4f;
+                                           damage = 40f;
+                                           lifetime = 40f;
+
+                                           pierceCap = 2;
+                                           pierce = true;
+                                           pierceBuilding = true;
+
+                                           collidesAir = false;
+
+                                           width = 20f;
+                                           height = 20f;
+
+                                           lightColor = hitColor = CandyPal.redMint;
+                                           frontColor = Color.white;
+
+                                           trailWidth = 4.5f;
+                                           trailLength = 8;
+                                           trailColor = lightColor;
+
+                                           shrinkY = 0f;
+                                           shrinkX = 0f;
                                        }};
                                    }};
                                }}
