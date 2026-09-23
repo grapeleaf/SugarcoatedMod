@@ -1,17 +1,36 @@
 package sugarcoated.content.type.unit;
 
+import mindustry.type.*;
+
 public class SCCreatureUnitType extends SCUnitType {
     /** What family this creature belongs to */
     public String creatureFamily = "none";
     /** Radius for alerting other units of the same family*/
     public float alertRadius = 64f;
 
+    //chasing
+
+    /** Whether this creature should chase targets */
+    public boolean shouldChase = true;
+    /** This creatures max change range, can be overridden by setting a value of >0*/
+    public float chaseRange = -1f,
+    /** How long this creature will chase for until it loses interest*/
+    chaseTimer = 160f;
+
+    //strafing
+
     /** Whether this unit should strafe around targets when attacking*/
     public boolean strafeTarget = true;
     /** Min strafe time */
     public float strafeTimeMin = 30f,
     /** Max strafe time */
-    strafeTimeMax = 90f;
+    strafeTimeMax = 90f,
+    /** Max strafing distance for this creature, can be overridden by setting a value of >0*/
+    strafeDistMax = -1f,
+    /** Strafe offset for this creature (e.g. if this is 24, creature can randomly move 4 tiles closer to the target)*/
+    strafeOffs = 24f;
+
+    //wandering
 
     /** Min wander time */
     public float wanderTimeMin = 120f,
@@ -24,5 +43,30 @@ public class SCCreatureUnitType extends SCUnitType {
 
     public SCCreatureUnitType(String name) {
         super(name);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        float margin = 4f;
+
+        if(strafeDistMax < 0){
+            strafeDistMax = Float.MAX_VALUE;
+            for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange) continue;
+
+                strafeDistMax = Math.min(range, weapon.range() - margin);
+            }
+        }
+
+        if(chaseRange < 0){
+            chaseRange = Float.MAX_VALUE;
+            for(Weapon weapon : weapons){
+                if(!weapon.useAttackRange) continue;
+
+                chaseRange = Math.max(range, weapon.range() - margin) * 2f;
+            }
+        }
     }
 }
