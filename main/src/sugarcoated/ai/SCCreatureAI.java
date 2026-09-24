@@ -9,8 +9,8 @@ import mindustry.ai.types.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
-import mindustry.graphics.Pal;
-import mindustry.world.blocks.defense.turrets.*;
+import sugarcoated.ai.state.CreatureState;
+import sugarcoated.ai.state.CreatureStateHandler;
 import sugarcoated.content.type.unit.*;
 
 public class SCCreatureAI extends CommandAI {
@@ -25,21 +25,26 @@ public class SCCreatureAI extends CommandAI {
     protected float strafeTimer;
     protected float chaseTimer;
 
-    protected boolean fleeing = false;
+    protected CreatureState state;
+    protected CreatureStateHandler stateHandler;
 
+    //DEBUG
     public static boolean debugView = true;
-    boolean isStrafing = false;
-    boolean isChasing = false;
 
     @Override
     public void unit(Unit unit){
         super.unit(unit);
         type = (SCCreatureUnitType)unit.type;
         home = null;
+
         wanderTimer = 0f;
         strafeTimer = 0f;
         chaseTimer = type.chaseTimer;
+
+        state = CreatureState.WANDER;
+        stateHandler = new CreatureStateHandler(this);
     }
+
     @Override
     public void updateUnit(){
         if(home == null){
@@ -52,90 +57,19 @@ public class SCCreatureAI extends CommandAI {
         }
 
         //register persistent combatTarget
-        if(combatTarget == null && !fleeing){
+        if(combatTarget == null){
             combatTarget = target != null ? target : attackTarget;
         }
 
-        if(fleeing){
-            if(withinHome()){
-                fleeing = false;
-            }
-
-            combatTarget = null;
-            if(targetPos == null){
-                targetPos = new Vec2();
-            }
-            targetPos.set(home);
-        }
-
-        if(combatTarget != null){
-            //flee when low health
-            if(type.flee && unit.health() <= type.fleeHealthThresh && !withinHome()){
-                fleeing = true;
-            }
-
-            //alert nearby friendly creatures
-            if(type.creatureFamily != null){
-                Units.nearby(unit.team, unit.x, unit.y, type.alertRadius, other -> {
-                    if(other != unit && other.type instanceof SCCreatureUnitType otherType && otherType.creatureFamily.equals(type.creatureFamily) && other.controller() instanceof SCCreatureAI ai){
-                        if(ai.combatTarget == null && attackTarget == null && !isAttacking()){
-                            ai.attackTarget = combatTarget;
-                        }
-                    }
-                });
-            }
-            //give up chase if too far
-            if(!inChaseRange()){
-                combatTarget = null;
-                attackTarget = null;
-                targetPos = null;
-                //reset chase timer if target escape its and is near home
-                if(withinHome()){
-                    chaseTimer = type.chaseTimer;
-                }
-
-                //debug
-                isChasing = false;
-                isStrafing = false;
-            }
-            //strafe if within range
-            else if(type.strafeTarget && inStrafeRange()){
-                attackTarget = null;
-                strafeTarget();
-
-                //debug
-                isChasing = false;
-                isStrafing = true;
-            }
-            //chase until lost patience
-            else if(type.shouldChase){
-                attackTarget = combatTarget;
-                chaseTimer -= Time.delta;
-
-                //debug
-                isChasing = true;
-                isStrafing = false;
-
-                if(chaseTimer <= 0f){
-                    combatTarget = null;
-                    attackTarget = null;
-                    targetPos = null;
-
-                    //debug
-                    isChasing = false;
-                }
-            }
-        }
+        chooseState();
+        stateHandler.update();
 
         //cooldown for chasing so it doesn't immediately chase after losing patience
-        if(chaseTimer <= 0f){
+        if(chaseTimer <= 0f && chaseTimer > type.chaseCooldown){
             chaseTimer -= Time.delta;
-            if(chaseTimer <= -60f * 5f){
-                chaseTimer = type.chaseTimer;
-            }
         }
 
-        //pursue the target for patrol, keeping the current position
+        //pursue the target for patrol, keeping the currentState position
         if(hasStance(UnitStance.patrol) && hasStance(UnitStance.pursueTarget) && target != null && attackTarget == null){
             //commanding a target overwrites targetPos, so add it to the queue
             if(targetPos != null){
@@ -179,16 +113,135 @@ public class SCCreatureAI extends CommandAI {
                 unit.updateBoosting(false);
             }
         }
+    }
 
-        if(commandController != null) return;
-        if(combatTarget != null) return;
-        if(attackTarget != null || target != null) return;
-        if(targetPos != null) return;
+    @Override
+    public void hit(Bullet bullet){
+        super.hit(bullet);
+        if(type.creatureFamily != null){
+            Units.nearby(unit.team, unit.x, unit.y, type.alertRadius, other -> {
+                if(other != unit && other.type instanceof SCCreatureUnitType otherType && otherType.creatureFamily.equals(type.creatureFamily)
+                    && other.controller() instanceof SCCreatureAI ai){
+
+                    if(ai.combatTarget == null && attackTarget == null && !isAttacking()){
+                        ai.combatTarget = combatTarget;
+                    }
+                }
+            });
+        }
+    }
+
+    public void updateState(CreatureState state){
+        switch(state){
+            case WANDER -> updateWander();
+            case CHASE -> updateChase();
+            case STRAFE -> updateStrafe();
+            case RETURN_HOME -> updateReturnHome();
+        }
+    }
+
+    public void enterState(CreatureState state){
+        switch(state){
+            case RETURN_HOME -> clearCombat();
+
+            case CHASE -> {
+                if(withinHome() || chaseTimer <= type.chaseCooldown){
+                    chaseTimer = type.chaseTimer;
+                }
+            }
+
+            case STRAFE -> strafeTimer = 0f;
+
+            case WANDER -> {
+                clearCombat();
+                targetPos = null;
+            }
+        }
+    }
+
+    public void exitState(CreatureState state) {
+        switch(state){
+            case CHASE -> targetPos = null;
+
+            case STRAFE -> {
+                targetPos = null;
+                strafeTarget = null;
+            }
+
+            case RETURN_HOME -> clearCombat();
+        }
+    }
+
+    protected void chooseState(){
+        //prioritize returning to home on low health
+        if(type.flee && unit.health() <= type.fleeHealthThresh && !withinHome()){
+            stateHandler.transition(CreatureState.RETURN_HOME);
+            return;
+        }
+
+        //stay on return home state until home
+        if(stateHandler.isState(CreatureState.RETURN_HOME)){
+            if(withinHome()){
+                stateHandler.transition(CreatureState.WANDER);
+            }
+            return;
+        }
+
+        if(combatTarget != null){
+            if(type.strafeTarget && inStrafeRange()){
+                stateHandler.transition(CreatureState.STRAFE);
+                return;
+            }
+            if(type.shouldChase && inChaseRange()){
+                stateHandler.transition(CreatureState.CHASE);
+                return;
+            }
+        }
+
+        if(!withinHome() && combatTarget == null){
+            stateHandler.transition(CreatureState.RETURN_HOME);
+            return;
+        }
+
+        if(withinHome()){
+            stateHandler.transition(CreatureState.WANDER);
+        }
+    }
+
+    protected void updateWander(){
         wander(home);
+    }
+    protected void updateChase(){
+        attackTarget = combatTarget;
+        chaseTimer -= Time.delta;
+
+        if(chaseTimer <= 0f){
+            combatTarget = null;
+            attackTarget = null;
+            targetPos = null;
+        }
+    }
+    protected void updateStrafe(){
+        if(combatTarget == null){
+            stateHandler.transition(CreatureState.WANDER);
+            return;
+        }
+
+        attackTarget = null;
+        strafeTarget();
+    }
+
+    protected void updateReturnHome(){
+        commandPosition(home);
+    }
+
+    protected void clearCombat(){
+        attackTarget = null;
+        combatTarget = null;
     }
 
     protected boolean withinHome(){
-        return home != null && unit.within(home, type.wanderRange);
+        return home != null && unit.within(home, type.homeReturnRange);
     }
 
     protected boolean inStrafeRange(){
@@ -242,7 +295,7 @@ public class SCCreatureAI extends CommandAI {
         if(unit == null || !unit.isAdded()) return;
         float textMargin = 8f;
 
-        //visualize chase range
+        //chase range
         Drawf.circles(unit.x, unit.y, unit.range() + type.chaseRange, Color.orange);
 
         //strafe range
@@ -250,31 +303,35 @@ public class SCCreatureAI extends CommandAI {
 
         //persistent combat target
         if(combatTarget != null){
-            Drawf.line(Pal.remove, unit.x, unit.y, combatTarget.x(), combatTarget.y());
-            Drawf.circles(combatTarget.x(), combatTarget.y(), 5f, Pal.remove);
+            Drawf.line(Color.red, unit.x, unit.y, combatTarget.x(), combatTarget.y());
+            Drawf.circles(combatTarget.x(), combatTarget.y(), 5f, Color.red);
         }
 
-        //current strafe position
-        if(isStrafing){
+        //strafeTarget
+        if(stateHandler.isState(CreatureState.STRAFE)){
             Drawf.line(Color.cyan, unit.x, unit.y, strafeTarget.x, strafeTarget.y);
-            Drawf.circles(strafeTarget.x, strafeTarget.y, 4f, Color.cyan);
+            Drawf.circles(strafeTarget.x, strafeTarget.y, 8f, Color.cyan);
+            Drawf.text("STRAFE POS", strafeTarget.x, strafeTarget.y + textMargin, Color.cyan);
         }
 
         //targetPos
         if(targetPos != null){
-            Drawf.line(Color.gold, unit.x, unit.y, targetPos.getX(), targetPos.getY());
+            Drawf.dashLine(Color.gold, unit.x, unit.y, targetPos.getX(), targetPos.getY());
             Drawf.circles(targetPos.getX(), targetPos.getY(), 5f, Color.gold);
+            Drawf.text("TARGET POS", targetPos.getX(), targetPos.getY() - textMargin, Color.gold);
         }
 
         //homePos
         if(home != null){
             Drawf.line(Color.green, unit.x, unit.y, home.getX(), home.getY());
             Drawf.circles(home.getX(), home.getY(), 5f, Color.green);
+            Drawf.dashCircle(home.getX(), home.getY(), type.homeReturnRange, Color.green);
+            Drawf.text("HOME", home.getX(), home.getY() + textMargin, Color.green);
+
         }
 
         //text
-        Drawf.text("ChaseTimer: " + Mathf.round(chaseTimer * 100f) / 100f, unit.x, unit.y + unit.hitSize + textMargin, Color.white);
-        Drawf.text("CHASING :" + isChasing, unit.x, unit.y + unit.hitSize + textMargin * 2, Color.white);
-        Drawf.text("STRAFING :" + isStrafing, unit.x, unit.y + unit.hitSize + textMargin * 3, Color.white);
+        Drawf.text("CurrentState: " + stateHandler.currentState, unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin, Color.white);
+        Drawf.text("ChaseTimer: " + Mathf.round(chaseTimer * 100f) / 100f, unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 2, Color.white);
     }
 }

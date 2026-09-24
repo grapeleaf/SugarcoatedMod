@@ -59,11 +59,11 @@ public class SCUnitTypes {
 
             terrainWalk = false;
 
-            wanderTimeMin = 60f;
+            wanderTimeMin = 90f;
             wanderTimeMax = 300f;
             wanderRange = 170f;
 
-            homeReturnRange = 400f;
+            chaseTimer = 7f * 60f;
 
             //Visual
             drawCell = false;
@@ -170,7 +170,7 @@ public class SCUnitTypes {
         babyMint = new SCCreatureUnitType("baby-mint"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
-                    return new SCCreatureAI();
+                    return new SCHealerCreatureAI();
                 }
                 return new CommandAI();
             };
@@ -192,11 +192,13 @@ public class SCUnitTypes {
 
             terrainWalk = false;
 
-            wanderTimeMin = 100f;
+            wanderTimeMin = 120f;
             wanderTimeMax = 350f;
             wanderRange = 120f;
 
-            homeReturnRange = 300f;
+            chaseTimer = 4f * 60f;
+
+            homeReturnRange = 150f;
 
             //Visual
             drawCell = false;

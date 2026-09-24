@@ -14,7 +14,9 @@ public class SCCreatureUnitType extends SCUnitType {
     /** This creatures max change range, can be overridden by setting a value of >0*/
     public float chaseRange = -1f,
     /** How long this creature will chase for until it loses interest*/
-    chaseTimer = 300f;
+    chaseTimer = 300f,
+    /** How long until this creature is able to chase targets again after chaseTimer reaches zero*/
+    chaseCooldown = 300f;
 
     //strafing
     /** Whether this unit should strafe around targets when attacking*/
@@ -44,7 +46,7 @@ public class SCCreatureUnitType extends SCUnitType {
     /** Max possible wandering range */
     wanderRange = 100f,
     /** Max distance from home until this creature wants to return */
-    homeReturnRange = 300f;
+    homeReturnRange = 200f;
 
     public SCCreatureUnitType(String name) {
         super(name);
@@ -53,9 +55,9 @@ public class SCCreatureUnitType extends SCUnitType {
     @Override
     public void init(){
         super.init();
+        chaseCooldown = -chaseCooldown;
 
         float margin = 4f;
-
         if(strafeDistMax < 0){
             strafeDistMax = Float.MAX_VALUE;
             for(Weapon weapon : weapons){
