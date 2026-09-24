@@ -61,7 +61,7 @@ public class SCUnitTypes {
 
             wanderTimeMin = 60f;
             wanderTimeMax = 300f;
-            wanderRange = 250f;
+            wanderRange = 170f;
 
             homeReturnRange = 400f;
 
@@ -71,12 +71,13 @@ public class SCUnitTypes {
 
             legCount = 6;
             legGroupSize = 2;
+            rippleScale = 0.5f;
 
             legLength = 10;
             legExtension = -1.5f;
             legBaseOffset = 3f;
             legLengthScl = 0.9f;
-            legForwardScl = 1.5f;
+            legForwardScl = 2f;
             legMoveSpace = 1.1f;
             legStraightLength = 1f;
             legMaxLength = 1f;
@@ -193,7 +194,7 @@ public class SCUnitTypes {
 
             wanderTimeMin = 100f;
             wanderTimeMax = 350f;
-            wanderRange = 180f;
+            wanderRange = 120f;
 
             homeReturnRange = 300f;
 
@@ -203,12 +204,13 @@ public class SCUnitTypes {
 
             legCount = 6;
             legGroupSize = 2;
+            rippleScale = 0.5f;
 
             legLength = 10;
             legExtension = -1.5f;
             legBaseOffset = 3f;
             legLengthScl = 0.9f;
-            legForwardScl = 1.5f;
+            legForwardScl = 2f;
             legMoveSpace = 1.1f;
             legStraightLength = 1f;
             legMaxLength = 1f;
@@ -319,11 +321,11 @@ public class SCUnitTypes {
             health = 5000;
             armor = 5;
 
-            speed = 0.8f;
-            drag = 0.04f;
+            speed = 2.3f;
+            drag = 0.14f;
 
-            hitSize = 17.5f;
-            rotateSpeed = 2;
+            hitSize = 32f;
+            rotateSpeed = 8;
 
             //Behavior
             creatureFamily = "pepper";
@@ -335,11 +337,13 @@ public class SCUnitTypes {
             strafeDistMax = 15f * 8f;
             strafeOffs = 7f * 8f;
             strafeTimeMin = 60f;
-            strafeTimeMax = 120f;
+            strafeTimeMax = 90f;
 
-            wanderTimeMin = 180f;
+            wanderTimeMin = 90f;
             wanderTimeMax = 480;
-            wanderRange = 250f;
+            wanderRange = 200f;
+
+            chaseTimer = 15f * 60f;
 
             homeReturnRange = 400f;
 
@@ -347,17 +351,17 @@ public class SCUnitTypes {
             drawCell = false;
             outlineColor = CandyPal.redMintOutline;
 
-            legCount = 8;
+            legCount = 6;
             legGroupSize = 2;
 
             legLength = 75f;
             legExtension = -15f;
             legBaseOffset = 7.5f;
             legLengthScl = 0.95f;
-            legForwardScl = 1.4f;
-            legMoveSpace = 0.3f;
-            legStraightLength = 1f;
-            legMaxLength = 1.1f;
+            legForwardScl = 2f;
+            legMoveSpace = 0.5f;
+            legStraightLength = 0.9f;
+            legMaxLength = 1.2f;
             legMinLength = 0.85f;
             legSplashDamage = 70f;
             legSplashRange = 50f;
@@ -442,7 +446,7 @@ public class SCUnitTypes {
 
                         speed = 9f;
                         damage = 35f;
-                        lifetime = 30f;
+                        lifetime = 20f;
                         drag = -0.015f;
 
                         homingPower = 0.26f;
@@ -464,6 +468,8 @@ public class SCUnitTypes {
                 }},
 
                 new Weapon(){{
+                    useAttackRange = false;
+
                     x = 0f;
                     y = 0f;
 
@@ -545,6 +551,7 @@ public class SCUnitTypes {
 
                                    shootOnDeath = true;
                                    shootOnDeathEffect = Fx.massiveExplosion;
+
 
                                    bullet = new ExplosionBulletType(300f, 60f){{
                                        despawnEffect = shootEffect = new WaveEffect(){{

@@ -9,7 +9,6 @@ public class SCCreatureUnitType extends SCUnitType {
     public float alertRadius = 64f;
 
     //chasing
-
     /** Whether this creature should chase targets */
     public boolean shouldChase = true;
     /** This creatures max change range, can be overridden by setting a value of >0*/
@@ -18,7 +17,6 @@ public class SCCreatureUnitType extends SCUnitType {
     chaseTimer = 300f;
 
     //strafing
-
     /** Whether this unit should strafe around targets when attacking*/
     public boolean strafeTarget = true;
     /** Min strafe time */
@@ -32,10 +30,15 @@ public class SCCreatureUnitType extends SCUnitType {
     /** Strafe offset for this creature (e.g. if this is 24, creature can randomly move 4 tiles closer to the target)*/
     strafeOffs = 24f;
 
-    //wandering
+    //fleeing
+    /** Determines whether this creature flees on low health or not*/
+    public boolean flee = true;
+    /** If the creatures health is below this number, it flees. Can be overridden by setting a value of >0*/
+    public float fleeHealthThresh = -1,
 
+    //wandering
     /** Min wander time */
-    public float wanderTimeMin = 120f,
+    wanderTimeMin = 120f,
     /** Max wander time */
     wanderTimeMax = 300f,
     /** Max possible wandering range */
@@ -69,6 +72,10 @@ public class SCCreatureUnitType extends SCUnitType {
 
                 chaseRange = Math.max(range, weapon.range() - margin) * 1.5f;
             }
+        }
+
+        if(fleeHealthThresh < 0){
+            fleeHealthThresh = health / 3;
         }
     }
 }

@@ -17,16 +17,17 @@ public class SCCreatureAI extends CommandAI {
     protected SCCreatureUnitType type;
     protected @Nullable Teamc combatTarget;
 
+    protected Vec2 wanderTarget = new Vec2();
+    protected Vec2 strafeTarget = new Vec2();
     protected Vec2 home;
 
     protected float wanderTimer;
     protected float strafeTimer;
     protected float chaseTimer;
 
-    protected Vec2 wanderTarget = new Vec2();
-    protected Vec2 strafeTarget = new Vec2();
+    protected boolean fleeing = false;
 
-    public static boolean debugView = false;
+    public static boolean debugView = true;
     boolean isStrafing = false;
     boolean isChasing = false;
 
@@ -41,12 +42,6 @@ public class SCCreatureAI extends CommandAI {
     }
     @Override
     public void updateUnit(){
-//        Log.info(" ");
-//        Log.info("CombatTarget: "+combatTarget);
-//        Log.info("Target: "+target);
-//        Log.info("AttackTarget: "+attackTarget);
-//        Log.info("TargetPos: "+targetPos);
-//        Log.info(" ");
         if(home == null){
             home = new Vec2(unit.x, unit.y);
         }
@@ -57,10 +52,28 @@ public class SCCreatureAI extends CommandAI {
         }
 
         //register persistent combatTarget
-        if(combatTarget == null){
+        if(combatTarget == null && !fleeing){
             combatTarget = target != null ? target : attackTarget;
         }
+
+        if(fleeing){
+            if(withinHome()){
+                fleeing = false;
+            }
+
+            combatTarget = null;
+            if(targetPos == null){
+                targetPos = new Vec2();
+            }
+            targetPos.set(home);
+        }
+
         if(combatTarget != null){
+            //flee when low health
+            if(type.flee && unit.health() <= type.fleeHealthThresh && !withinHome()){
+                fleeing = true;
+            }
+
             //alert nearby friendly creatures
             if(type.creatureFamily != null){
                 Units.nearby(unit.team, unit.x, unit.y, type.alertRadius, other -> {
@@ -76,8 +89,10 @@ public class SCCreatureAI extends CommandAI {
                 combatTarget = null;
                 attackTarget = null;
                 targetPos = null;
-                //reset chase timer if target escape its radius
-                chaseTimer = type.chaseTimer;
+                //reset chase timer if target escape its and is near home
+                if(withinHome()){
+                    chaseTimer = type.chaseTimer;
+                }
 
                 //debug
                 isChasing = false;
@@ -165,13 +180,19 @@ public class SCCreatureAI extends CommandAI {
             }
         }
 
-        if(commandController == null || combatTarget == null){
-            wander(home);
-        }
+        if(commandController != null) return;
+        if(combatTarget != null) return;
+        if(attackTarget != null || target != null) return;
+        if(targetPos != null) return;
+        wander(home);
+    }
+
+    protected boolean withinHome(){
+        return home != null && unit.within(home, type.wanderRange);
     }
 
     protected boolean inStrafeRange(){
-        return combatTarget != null && unit.within(combatTarget, unit.range() + 10f);
+        return combatTarget != null && unit.within(combatTarget, unit.range());
     }
 
     protected boolean inChaseRange(){
@@ -183,13 +204,17 @@ public class SCCreatureAI extends CommandAI {
 
         if(strafeTimer <= 0f){
             float angle = combatTarget.angleTo(unit) + Mathf.range(type.strafeAngle);
-            float distance = (type.strafeDistMax - 10f) - (Mathf.random(type.strafeOffs));
+            float distance = (type.strafeDistMax - 10f) - Mathf.random(type.strafeOffs);
+            float maxDistance = type.range - 5f;
 
             strafeTimer = Mathf.random(type.strafeTimeMin, type.strafeTimeMax);
-            strafeTarget.set(
-                combatTarget.x() + Mathf.cosDeg(angle) * distance,
-                    combatTarget.y() + Mathf.sinDeg(angle) * distance
-            );
+
+            if(unit.health() <= type.health / 2f){
+                strafeTarget.set(combatTarget.x() + Mathf.cosDeg(angle) * maxDistance, combatTarget.y() + Mathf.sinDeg(angle) * maxDistance);
+            } else {
+                strafeTarget.set(combatTarget.x() + Mathf.cosDeg(angle) * distance, combatTarget.y() + Mathf.sinDeg(angle) * distance);
+            }
+
             if(targetPos == null){
                 targetPos = new Vec2();
             }
@@ -233,6 +258,18 @@ public class SCCreatureAI extends CommandAI {
         if(isStrafing){
             Drawf.line(Color.cyan, unit.x, unit.y, strafeTarget.x, strafeTarget.y);
             Drawf.circles(strafeTarget.x, strafeTarget.y, 4f, Color.cyan);
+        }
+
+        //targetPos
+        if(targetPos != null){
+            Drawf.line(Color.gold, unit.x, unit.y, targetPos.getX(), targetPos.getY());
+            Drawf.circles(targetPos.getX(), targetPos.getY(), 5f, Color.gold);
+        }
+
+        //homePos
+        if(home != null){
+            Drawf.line(Color.green, unit.x, unit.y, home.getX(), home.getY());
+            Drawf.circles(home.getX(), home.getY(), 5f, Color.green);
         }
 
         //text
