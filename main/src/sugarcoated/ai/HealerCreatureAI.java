@@ -21,12 +21,6 @@ public class HealerCreatureAI extends CreatureAI {
     }
 
     @Override
-    public void updateUnit() {
-        super.updateUnit();
-        Log.info(healTarget);
-    }
-
-    @Override
     public void updateState(CreatureState state){
         if(stateHandler.isState(CreatureState.HEAL_ALLY)){
             updateHealAlly();
@@ -43,17 +37,24 @@ public class HealerCreatureAI extends CreatureAI {
     }
 
     @Override
-    protected void chooseState(){
-        super.chooseState();
-        //only look for heal targets if not attacking
-        if((combatTarget == null || !isAttacking()) && healTarget == null){
-            Log.info("choosing");
+    protected CreatureState preferredState(){
+        CreatureState preferred = super.preferredState();
+
+        // return home has priority.
+        if(preferred == CreatureState.RETURN_HOME){
+            return preferred;
+        }
+
+        // only look for heal targets when at home or wandering
+        if(withinHome() || stateHandler.isState(CreatureState.WANDER)){
             findHealTarget();
         }
 
         if(healTarget != null){
-            stateHandler.transition(CreatureState.HEAL_ALLY);
+            return CreatureState.HEAL_ALLY;
         }
+
+        return preferred;
     }
 
     protected void updateHealAlly(){

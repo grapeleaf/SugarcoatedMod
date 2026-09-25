@@ -26,7 +26,6 @@ public class CreatureAI extends CommandAI {
     protected float chaseTimer;
     protected float investigateTimer;
 
-    protected CreatureState state;
     protected CreatureStateHandler stateHandler;
 
     //DEBUG
@@ -43,13 +42,11 @@ public class CreatureAI extends CommandAI {
         chaseTimer = type.chaseTimer;
         investigateTimer = 0f;
 
-        state = CreatureState.WANDER;
         stateHandler = new CreatureStateHandler(this);
     }
 
     @Override
     public void updateUnit(){
-        Log.info(inChaseRange());
         if(home == null){
             home = new Vec2(unit.x, unit.y);
         }
@@ -64,7 +61,7 @@ public class CreatureAI extends CommandAI {
             combatTarget = target != null ? target : attackTarget;
         }
 
-        chooseState();
+        transitionState();
         stateHandler.update();
 
         //cooldown for chasing so it doesn't immediately chase after losing patience
@@ -183,39 +180,36 @@ public class CreatureAI extends CommandAI {
         }
     }
 
-    protected void chooseState(){
+    protected CreatureState preferredState(){
         //prioritize returning to home on low health
         if(type.flee && unit.health() <= type.fleeHealthThresh && !withinHome()){
-            stateHandler.transition(CreatureState.RETURN_HOME);
-            return;
+            return CreatureState.RETURN_HOME;
         }
 
         //stay on return home state until home
         if(stateHandler.isState(CreatureState.RETURN_HOME)){
-            if(withinHome()){
-                stateHandler.transition(CreatureState.WANDER);
-            }
-            return;
+            return withinHome() ? CreatureState.WANDER : CreatureState.RETURN_HOME;
         }
 
         //combat states
         if(combatTarget != null){
             if(type.strafeTarget && inStrafeRange()){
-                stateHandler.transition(CreatureState.STRAFE);
-                return;
+                return CreatureState.STRAFE;
             }
             if(type.shouldChase && inChaseRange()){
-                stateHandler.transition(CreatureState.CHASE);
-                return;
+                return CreatureState.CHASE;
             }
         }
 
-        if(withinHome()){
-            stateHandler.transition(CreatureState.WANDER);
-            return;
+        if(!withinHome()){
+            return CreatureState.RETURN_HOME;
         }
 
-        stateHandler.transition(CreatureState.RETURN_HOME);
+        return CreatureState.WANDER;
+    }
+
+    protected void transitionState(){
+        stateHandler.transition(preferredState());
     }
 
     protected void updateWander(){
@@ -385,5 +379,6 @@ public class CreatureAI extends CommandAI {
         Drawf.text("TargetPos: " + ((targetPos != null) ? targetPos : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 3, Color.white);
         Drawf.text("CombatTarget: " + ((combatTarget != null) ? combatTarget : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 4, Color.white);
         Drawf.text("AttackTarget: " + ((attackTarget != null) ? attackTarget : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 5, Color.white);
+        Drawf.text("Target: " + ((target != null) ? target : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 6, Color.white);
     }
 }
