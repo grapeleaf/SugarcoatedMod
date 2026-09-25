@@ -13,7 +13,7 @@ import sugarcoated.ai.state.CreatureState;
 import sugarcoated.ai.state.CreatureStateHandler;
 import sugarcoated.content.type.unit.*;
 
-public class SCCreatureAI extends CommandAI {
+public class CreatureAI extends CommandAI {
     protected SCCreatureUnitType type;
     protected @Nullable Teamc combatTarget;
 
@@ -24,6 +24,7 @@ public class SCCreatureAI extends CommandAI {
     protected float wanderTimer;
     protected float strafeTimer;
     protected float chaseTimer;
+    protected float investigateTimer;
 
     protected CreatureState state;
     protected CreatureStateHandler stateHandler;
@@ -40,6 +41,7 @@ public class SCCreatureAI extends CommandAI {
         wanderTimer = 0f;
         strafeTimer = 0f;
         chaseTimer = type.chaseTimer;
+        investigateTimer = 0f;
 
         state = CreatureState.WANDER;
         stateHandler = new CreatureStateHandler(this);
@@ -47,6 +49,7 @@ public class SCCreatureAI extends CommandAI {
 
     @Override
     public void updateUnit(){
+        Log.info(inChaseRange());
         if(home == null){
             home = new Vec2(unit.x, unit.y);
         }
@@ -121,7 +124,7 @@ public class SCCreatureAI extends CommandAI {
         if(type.creatureFamily != null){
             Units.nearby(unit.team, unit.x, unit.y, type.alertRadius, other -> {
                 if(other != unit && other.type instanceof SCCreatureUnitType otherType && otherType.creatureFamily.equals(type.creatureFamily)
-                    && other.controller() instanceof SCCreatureAI ai){
+                    && other.controller() instanceof CreatureAI ai){
 
                     if(ai.combatTarget == null && attackTarget == null && !isAttacking()){
                         ai.combatTarget = combatTarget;
@@ -137,6 +140,7 @@ public class SCCreatureAI extends CommandAI {
             case CHASE -> updateChase();
             case STRAFE -> updateStrafe();
             case RETURN_HOME -> updateReturnHome();
+            case INVESTIGATE -> updateInvestigate();
         }
     }
 
@@ -145,8 +149,15 @@ public class SCCreatureAI extends CommandAI {
             case RETURN_HOME -> clearCombat();
 
             case CHASE -> {
+                lastTargetPos = null;
                 if(withinHome() || chaseTimer <= type.chaseCooldown){
                     chaseTimer = type.chaseTimer;
+                }
+            }
+
+            case INVESTIGATE -> {
+                if(investigateTimer <= 0){
+                    investigateTimer = 5f * 60f;
                 }
             }
 
@@ -187,6 +198,7 @@ public class SCCreatureAI extends CommandAI {
             return;
         }
 
+        //combat states
         if(combatTarget != null){
             if(type.strafeTarget && inStrafeRange()){
                 stateHandler.transition(CreatureState.STRAFE);
@@ -198,29 +210,52 @@ public class SCCreatureAI extends CommandAI {
             }
         }
 
-        if(!withinHome() && combatTarget == null){
-            stateHandler.transition(CreatureState.RETURN_HOME);
+        if(withinHome()){
+            stateHandler.transition(CreatureState.WANDER);
             return;
         }
 
-        if(withinHome()){
-            stateHandler.transition(CreatureState.WANDER);
-        }
+        stateHandler.transition(CreatureState.RETURN_HOME);
     }
 
     protected void updateWander(){
         wander(home);
     }
-    protected void updateChase(){
-        attackTarget = combatTarget;
-        chaseTimer -= Time.delta;
 
+    protected void updateInvestigate(){
+        if(lastTargetPos == null) return;
+        investigateTimer -= Time.delta;
+
+        wander(lastTargetPos);
+    }
+
+    protected void updateChase(){
+        chaseTimer -= Time.delta;
         if(chaseTimer <= 0f){
             combatTarget = null;
             attackTarget = null;
             targetPos = null;
+            return;
+        }
+        //if path to combatTarget not obstructed, prefer this path
+        if(!ControlPathfinder.isNearObstacle(unit, unit.tileX(), unit.tileY(), combatTarget.tileX(), combatTarget.tileY())){
+            attackTarget = combatTarget;
+            setupLastPos();
+        } else {
+            //must mean there is a path but its just obstructed
+            if(lastTargetPos != null && targetPos == null){
+                moveTo(lastTargetPos, 30f);
+                if(unit.within(lastTargetPos.x, lastTargetPos.y, 32f)){
+                    chaseTimer -= Time.delta * 2;
+                }
+            }
+            if(targetPos == null){
+                targetPos = new Vec2();
+                targetPos.set(combatTarget);
+            }
         }
     }
+
     protected void updateStrafe(){
         if(combatTarget == null){
             stateHandler.transition(CreatureState.WANDER);
@@ -261,6 +296,10 @@ public class SCCreatureAI extends CommandAI {
             float maxDistance = type.range - 5f;
 
             strafeTimer = Mathf.random(type.strafeTimeMin, type.strafeTimeMax);
+
+            if(strafeTarget == null){
+                strafeTarget = new Vec2();
+            }
 
             if(unit.health() <= type.health / 2f){
                 strafeTarget.set(combatTarget.x() + Mathf.cosDeg(angle) * maxDistance, combatTarget.y() + Mathf.sinDeg(angle) * maxDistance);
@@ -305,6 +344,7 @@ public class SCCreatureAI extends CommandAI {
         if(combatTarget != null){
             Drawf.line(Color.red, unit.x, unit.y, combatTarget.x(), combatTarget.y());
             Drawf.circles(combatTarget.x(), combatTarget.y(), 5f, Color.red);
+            Drawf.text("COMBAT TARGET", combatTarget.x(), combatTarget.y() + textMargin, Color.red);
         }
 
         //strafeTarget
@@ -315,11 +355,19 @@ public class SCCreatureAI extends CommandAI {
         }
 
         //targetPos
+        if(lastTargetPos != null){
+            Drawf.dashLine(Color.orange, unit.x, unit.y, lastTargetPos.getX(), lastTargetPos.getY());
+            Drawf.circles(lastTargetPos.getX(), lastTargetPos.getY(), 3f, Color.orange);
+            Drawf.text("LAST TARGET POS", lastTargetPos.getX(), lastTargetPos.getY() - textMargin * 2, Color.orange);
+        }
+
+        //targetPos
         if(targetPos != null){
             Drawf.dashLine(Color.gold, unit.x, unit.y, targetPos.getX(), targetPos.getY());
             Drawf.circles(targetPos.getX(), targetPos.getY(), 5f, Color.gold);
             Drawf.text("TARGET POS", targetPos.getX(), targetPos.getY() - textMargin, Color.gold);
         }
+
 
         //homePos
         if(home != null){
@@ -330,8 +378,12 @@ public class SCCreatureAI extends CommandAI {
 
         }
 
+        //make this better tbh
         //text
         Drawf.text("CurrentState: " + stateHandler.currentState, unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin, Color.white);
         Drawf.text("ChaseTimer: " + Mathf.round(chaseTimer * 100f) / 100f, unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 2, Color.white);
+        Drawf.text("TargetPos: " + ((targetPos != null) ? targetPos : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 3, Color.white);
+        Drawf.text("CombatTarget: " + ((combatTarget != null) ? combatTarget : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 4, Color.white);
+        Drawf.text("AttackTarget: " + ((attackTarget != null) ? attackTarget : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 5, Color.white);
     }
 }

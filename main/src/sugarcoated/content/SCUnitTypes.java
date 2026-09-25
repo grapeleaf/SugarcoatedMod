@@ -19,6 +19,7 @@ import mindustry.type.*;
 import mindustry.type.unit.MissileUnitType;
 import sugarcoated.CandyPal;
 import sugarcoated.ai.*;
+import sugarcoated.annotations.Annotations.*;
 import sugarcoated.content.type.unit.*;
 import sugarcoated.entities.abilities.*;
 import sugarcoated.gen.*;
@@ -37,10 +38,11 @@ public class SCUnitTypes {
         babyPepper = new SCCreatureUnitType("baby-pepper"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
-                    return new SCCreatureAI();
+                    return new CreatureAI();
                 }
                 return new CommandAI();
             };
+
             constructor = LegsUnit::create;
 
             //Stat
@@ -63,7 +65,7 @@ public class SCUnitTypes {
             wanderTimeMax = 300f;
             wanderRange = 170f;
 
-            chaseTimer = 7f * 60f;
+            chaseTimer = 6f * 60f;
 
             //Visual
             drawCell = false;
@@ -170,9 +172,9 @@ public class SCUnitTypes {
         babyMint = new SCCreatureUnitType("baby-mint"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
-                    return new SCHealerCreatureAI();
+                    return new CreatureAI();
                 }
-                return new CommandAI();
+                return new HealerCreatureAI();
             };
             constructor = LegsUnit::create;
 
@@ -313,7 +315,7 @@ public class SCUnitTypes {
         sweetMother = new SCCreatureUnitType("sweet-mother"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
-                    return new SCCreatureAI();
+                    return new CreatureAI();
                 }
                 return new CommandAI();
             };
@@ -324,7 +326,7 @@ public class SCUnitTypes {
             armor = 5;
 
             speed = 2.3f;
-            drag = 0.14f;
+            drag = 0.08f;
 
             hitSize = 32f;
             rotateSpeed = 8;
@@ -343,9 +345,9 @@ public class SCUnitTypes {
 
             wanderTimeMin = 90f;
             wanderTimeMax = 480;
-            wanderRange = 200f;
+            wanderRange = 250f;
 
-            chaseTimer = 15f * 60f;
+            chaseTimer = 10f * 60f;
 
             homeReturnRange = 400f;
 
@@ -366,7 +368,7 @@ public class SCUnitTypes {
             legMaxLength = 1.2f;
             legMinLength = 0.85f;
             legSplashDamage = 70f;
-            legSplashRange = 50f;
+            legSplashRange = 30f;
             legStraightness = 0f;
 
             lockLegBase = true;
@@ -419,7 +421,7 @@ public class SCUnitTypes {
                     x = 12f;
                     y = -1f;
                     baseRotation = -90f;
-                    shootCone = 190f;
+                    shootCone = 100f;
 
                     reload = 45f;
 

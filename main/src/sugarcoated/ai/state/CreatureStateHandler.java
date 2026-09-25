@@ -1,14 +1,14 @@
 package sugarcoated.ai.state;
 
-import sugarcoated.ai.SCCreatureAI;
+import sugarcoated.ai.CreatureAI;
 
 public class CreatureStateHandler {
-    protected final SCCreatureAI ai;
+    protected final CreatureAI ai;
 
     public CreatureState currentState = CreatureState.WANDER;
     public CreatureState previousState = CreatureState.WANDER;
 
-    public CreatureStateHandler(SCCreatureAI ai) {
+    public CreatureStateHandler(CreatureAI ai) {
         this.ai = ai;
     }
 
@@ -30,6 +30,7 @@ public class CreatureStateHandler {
     public void update(){
         ai.updateState(currentState);
     }
+
     public boolean isState(CreatureState state){
         return currentState == state;
     }

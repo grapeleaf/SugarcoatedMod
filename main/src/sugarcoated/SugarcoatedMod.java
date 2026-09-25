@@ -1,14 +1,12 @@
 package sugarcoated;
 
 import arc.*;
-import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
-import mindustry.ui.dialogs.*;
-import sugarcoated.ai.SCCreatureAI;
+import sugarcoated.ai.CreatureAI;
 import sugarcoated.annotations.Annotations.*;
 import sugarcoated.content.SCBlocks;
 import sugarcoated.content.SCItems;
@@ -43,11 +41,11 @@ public class SugarcoatedMod extends Mod{
             Events.on(FileTreeInitEvent.class, e -> Core.app.post(SCSounds::load));
         }
 
-        Events.run(EventType.Trigger.draw, () -> {
-            if(!SCCreatureAI.debugView || headless) return;
+        Events.run(Trigger.postDraw, () -> {
+            if(!CreatureAI.debugView || headless) return;
 
             Groups.unit.each(unit -> {
-                if(unit.controller() instanceof SCCreatureAI ai){
+                if(unit.controller() instanceof CreatureAI ai){
                     ai.drawDebug();
                 }
             });

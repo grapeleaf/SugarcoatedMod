@@ -10,7 +10,7 @@ import mindustry.graphics.*;
 import sugarcoated.ai.state.*;
 import sugarcoated.content.type.unit.*;
 
-public class SCHealerCreatureAI extends SCCreatureAI{
+public class HealerCreatureAI extends CreatureAI {
     protected @Nullable Unit healTarget;
     public RepairFieldAbility repairAbility;
 
