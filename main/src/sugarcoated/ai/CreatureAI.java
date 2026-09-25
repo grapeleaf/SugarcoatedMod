@@ -1,8 +1,10 @@
 package sugarcoated.ai;
 
+import arc.func.*;
 import arc.graphics.Color;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
@@ -30,6 +32,14 @@ public class CreatureAI extends CommandAI {
 
     //DEBUG
     public static boolean debugView = true;
+    @SuppressWarnings("unchecked")
+    protected final Seq<Prov<String>> debugText = Seq.with(
+            () -> "CurrentState: " + stateHandler.currentState,
+            () -> "ChaseTimer: " + Mathf.round(chaseTimer * 100f) / 100f,
+            () -> "TargetPos: " + targetPos,
+            () -> "CombatTarget: " + combatTarget,
+            () -> "AttackTarget: " + attackTarget
+    );
 
     @Override
     public void unit(Unit unit){
@@ -251,11 +261,6 @@ public class CreatureAI extends CommandAI {
     }
 
     protected void updateStrafe(){
-        if(combatTarget == null){
-            stateHandler.transition(CreatureState.WANDER);
-            return;
-        }
-
         attackTarget = null;
         strafeTarget();
     }
@@ -270,7 +275,7 @@ public class CreatureAI extends CommandAI {
     }
 
     protected boolean withinHome(){
-        return home != null && unit.within(home, type.homeReturnRange);
+        return home != null && unit.within(home, type.wanderRange);
     }
 
     protected boolean inStrafeRange(){
@@ -374,11 +379,17 @@ public class CreatureAI extends CommandAI {
 
         //make this better tbh
         //text
-        Drawf.text("CurrentState: " + stateHandler.currentState, unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin, Color.white);
-        Drawf.text("ChaseTimer: " + Mathf.round(chaseTimer * 100f) / 100f, unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 2, Color.white);
-        Drawf.text("TargetPos: " + ((targetPos != null) ? targetPos : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 3, Color.white);
-        Drawf.text("CombatTarget: " + ((combatTarget != null) ? combatTarget : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 4, Color.white);
-        Drawf.text("AttackTarget: " + ((attackTarget != null) ? attackTarget : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 5, Color.white);
-        Drawf.text("Target: " + ((target != null) ? target : "null"), unit.x + (unit.hitSize / 2), unit.y + unit.hitSize + textMargin * 6, Color.white);
+        drawDebugText(debugText);
+    }
+
+    protected void drawDebugText(Seq<Prov<String>> values){
+        float textX = unit.x + unit.hitSize / 2f;
+        float textY = unit.y + unit.hitSize + 8f;
+        float spacing = 8f;
+
+        for(Prov<String> value : values){
+            Drawf.text(value.get(), textX, textY, Color.white);
+            textY += spacing;
+        }
     }
 }

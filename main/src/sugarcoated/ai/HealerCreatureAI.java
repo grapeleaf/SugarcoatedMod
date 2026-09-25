@@ -11,13 +11,22 @@ import sugarcoated.ai.state.*;
 import sugarcoated.content.type.unit.*;
 
 public class HealerCreatureAI extends CreatureAI {
-    protected @Nullable Unit healTarget;
     public RepairFieldAbility repairAbility;
+
+    protected @Nullable Unit healTarget;
+    protected final Interval healTargetTimer = new Interval();
+
+    {
+        debugText.add(() -> "HealTarget: " + healTarget);
+    }
 
     @Override
     public void unit(Unit unit) {
         super.unit(unit);
         repairAbility = (RepairFieldAbility)unit.type.abilities.find(a -> a instanceof RepairFieldAbility);
+
+        healTarget = null;
+        healTargetTimer.reset(0,20f);
     }
 
     @Override
@@ -46,7 +55,9 @@ public class HealerCreatureAI extends CreatureAI {
         }
 
         // only look for heal targets when at home or wandering
-        if(withinHome() || stateHandler.isState(CreatureState.WANDER)){
+        if((withinHome() || stateHandler.isState(CreatureState.WANDER))
+            && (combatTarget == null || !isAttacking())
+            && healTarget == null && healTargetTimer.get(0,20f)){
             findHealTarget();
         }
 
@@ -59,10 +70,8 @@ public class HealerCreatureAI extends CreatureAI {
 
     protected void updateHealAlly(){
         if(healTarget == null || !healTarget.isValid() || !healTarget.damaged()){
-            findHealTarget();
-        }
-
-        if(healTarget == null){
+            healTarget = null;
+            targetPos = null;
             return;
         }
 
@@ -96,7 +105,7 @@ public class HealerCreatureAI extends CreatureAI {
     @Override
     public void drawDebug() {
         super.drawDebug();
-        //persistent combat target
+        //heal target
         if(healTarget != null){
             Drawf.line(Color.lime, unit.x, unit.y, healTarget.x(), healTarget.y());
             Drawf.circles(healTarget.x(), healTarget.y(), 5f, Color.lime);

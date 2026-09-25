@@ -549,7 +549,7 @@ public class SCUnitTypes {
                                    shootSound = SCSounds.explosionMagicLarge;
                                    shootSoundVolume = 1.5f;
 
-                                   shootCone = 350f;
+                                   shootCone = 45f;
                                    mirror = false;
                                    reload = 1f;
 
