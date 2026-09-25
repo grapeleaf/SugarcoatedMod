@@ -79,7 +79,6 @@ public class HealerCreatureAI extends CreatureAI {
     }
 
     protected void findHealTarget(){
-        Log.info("finding heal target");
         //clear old target
         healTarget = null;
 
