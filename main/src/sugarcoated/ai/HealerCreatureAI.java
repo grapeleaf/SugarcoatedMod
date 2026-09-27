@@ -16,13 +16,14 @@ public class HealerCreatureAI extends CreatureAI {
     protected @Nullable Unit healTarget;
     protected final Interval healTargetTimer = new Interval();
 
+    //DEBUG
     {
         debugText.add(() -> "HealTarget: " + healTarget);
     }
 
     @Override
-    public void unit(Unit unit) {
-        super.unit(unit);
+    public void init() {
+        super.init();
         repairAbility = (RepairFieldAbility)unit.type.abilities.find(a -> a instanceof RepairFieldAbility);
 
         healTarget = null;

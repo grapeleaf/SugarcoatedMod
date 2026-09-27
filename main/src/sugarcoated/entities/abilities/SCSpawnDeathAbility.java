@@ -6,6 +6,7 @@ import mindustry.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import sugarcoated.ai.CreatureAI;
 
 public class SCSpawnDeathAbility extends SpawnDeathAbility {
     /** Status effect applied to spawned units */
@@ -27,6 +28,9 @@ public class SCSpawnDeathAbility extends SpawnDeathAbility {
                 var un = this.unit.spawn(unit.team, unit.x + Tmp.v1.x, unit.y + Tmp.v1.y);
 
                 un.rotation = faceOutwards ? Tmp.v1.angle() : unit.rotation + Mathf.range(5f);
+                if(un.controller() instanceof CreatureAI otherAi && unit.controller() instanceof CreatureAI unitAi && unitAi.home != null){
+                    otherAi.home = unitAi.home;
+                }
 
                 if(appliedEffect != null){
                     un.apply(appliedEffect, effectDuration);

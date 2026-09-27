@@ -16,12 +16,11 @@ import sugarcoated.ai.state.CreatureStateHandler;
 import sugarcoated.content.type.unit.*;
 
 public class CreatureAI extends CommandAI {
-    protected SCCreatureUnitType type;
-    protected @Nullable Teamc combatTarget;
+    public @Nullable Teamc combatTarget;
+    public Vec2 home;
 
     protected Vec2 wanderTarget = new Vec2();
     protected Vec2 strafeTarget = new Vec2();
-    protected Vec2 home;
 
     protected float wanderTimer;
     protected float strafeTimer;
@@ -29,21 +28,25 @@ public class CreatureAI extends CommandAI {
     protected float investigateTimer;
 
     protected CreatureStateHandler stateHandler;
+    protected SCCreatureUnitType type;
 
     //DEBUG
-    public static boolean debugView = true;
+    public static boolean debugView = false;
     @SuppressWarnings("unchecked")
     protected final Seq<Prov<String>> debugText = Seq.with(
             () -> "CurrentState: " + stateHandler.currentState,
             () -> "ChaseTimer: " + Mathf.round(chaseTimer * 100f) / 100f,
             () -> "TargetPos: " + targetPos,
             () -> "CombatTarget: " + combatTarget,
-            () -> "AttackTarget: " + attackTarget
+            () -> "AttackTarget: " + attackTarget,
+            () -> "InvestigateTimer: " + investigateTimer
     );
 
     @Override
-    public void unit(Unit unit){
-        super.unit(unit);
+    public void init(){
+        super.init();
+
+        stateHandler = new CreatureStateHandler(this);
         type = (SCCreatureUnitType)unit.type;
         home = null;
 
@@ -51,9 +54,13 @@ public class CreatureAI extends CommandAI {
         strafeTimer = 0f;
         chaseTimer = type.chaseTimer;
         investigateTimer = 0f;
-
-        stateHandler = new CreatureStateHandler(this);
     }
+
+//    @Override
+//    public void unit(Unit unit){
+//        super.unit(unit);
+//
+//    }
 
     @Override
     public void updateUnit(){
@@ -181,10 +188,9 @@ public class CreatureAI extends CommandAI {
         switch(state){
             case CHASE -> targetPos = null;
 
-            case STRAFE -> {
-                targetPos = null;
-                strafeTarget = null;
-            }
+            case STRAFE -> targetPos = null;
+
+            case INVESTIGATE -> investigateTimer = 0;
 
             case RETURN_HOME -> clearCombat();
         }
@@ -209,6 +215,7 @@ public class CreatureAI extends CommandAI {
             if(type.shouldChase && inChaseRange()){
                 return CreatureState.CHASE;
             }
+            return CreatureState.INVESTIGATE;
         }
 
         if(!withinHome()){
@@ -228,7 +235,9 @@ public class CreatureAI extends CommandAI {
 
     protected void updateInvestigate(){
         if(lastTargetPos == null) return;
-        investigateTimer -= Time.delta;
+        if(unit.within(lastTargetPos, type.wanderRange)){
+            investigateTimer -= Time.delta;
+        }
 
         wander(lastTargetPos);
     }
@@ -269,6 +278,13 @@ public class CreatureAI extends CommandAI {
         commandPosition(home);
     }
 
+    protected void setHome(Vec2 pos){
+        home.set(pos);
+    }
+    protected void setHome(float x, float y){
+        home.set(x, y);
+    }
+
     protected void clearCombat(){
         attackTarget = null;
         combatTarget = null;
@@ -294,10 +310,10 @@ public class CreatureAI extends CommandAI {
             float distance = (type.strafeDistMax - 10f) - Mathf.random(type.strafeOffs);
             float maxDistance = type.range - 5f;
 
-            strafeTimer = Mathf.random(type.strafeTimeMin, type.strafeTimeMax);
-
-            if(strafeTarget == null){
-                strafeTarget = new Vec2();
+            if(type.alwaysStrafe && unit.within(strafeTarget, 8f * (type.hitSize / 8))){
+                strafeTimer = 0;
+            } else {
+                strafeTimer = Mathf.random(type.strafeTimeMin, type.strafeTimeMax);
             }
 
             if(unit.health() <= type.health / 2f){
@@ -377,7 +393,6 @@ public class CreatureAI extends CommandAI {
 
         }
 
-        //make this better tbh
         //text
         drawDebugText(debugText);
     }

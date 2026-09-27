@@ -16,10 +16,10 @@ import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.unit.MissileUnitType;
+import mindustry.type.unit.*;
 import sugarcoated.CandyPal;
 import sugarcoated.ai.*;
-import sugarcoated.annotations.Annotations.*;
+import sugarcoated.content.blocks.*;
 import sugarcoated.content.type.unit.*;
 import sugarcoated.entities.abilities.*;
 import sugarcoated.gen.*;
@@ -32,7 +32,7 @@ import static mindustry.content.Fx.v;
 public class SCUnitTypes {
 
     //Peppermint Family
-    public static UnitType babyPepper, babyMint, sweetMother;
+    public static UnitType babyPepper, babyMint, broodfather, sweetMother;
 
     public static void load(){
         babyPepper = new SCCreatureUnitType("baby-pepper"){{
@@ -63,7 +63,7 @@ public class SCUnitTypes {
 
             wanderTimeMin = 90f;
             wanderTimeMax = 300f;
-            wanderRange = 170f;
+            wanderRange = 200f;
 
             chaseTimer = 6f * 60f;
 
@@ -73,7 +73,7 @@ public class SCUnitTypes {
 
             legCount = 6;
             legGroupSize = 2;
-            rippleScale = 0.5f;
+            rippleScale = 0.25f;
 
             legLength = 10;
             legExtension = -1.5f;
@@ -101,7 +101,7 @@ public class SCUnitTypes {
             groundLayer = Layer.legUnit - 1f;
 
             weapons.addAll(
-                new Weapon("baby-pepper-weapon"){{
+                new Weapon(){{
                     mirror = true;
                     alternate = false;
                     showStatSprite = false;
@@ -172,9 +172,9 @@ public class SCUnitTypes {
         babyMint = new SCCreatureUnitType("baby-mint"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
-                    return new CreatureAI();
+                    return new HealerCreatureAI();
                 }
-                return new HealerCreatureAI();
+                return new CommandAI();
             };
             constructor = LegsUnit::create;
 
@@ -196,7 +196,7 @@ public class SCUnitTypes {
 
             wanderTimeMin = 120f;
             wanderTimeMax = 350f;
-            wanderRange = 120f;
+            wanderRange = 170f;
 
             chaseTimer = 4f * 60f;
 
@@ -208,7 +208,7 @@ public class SCUnitTypes {
 
             legCount = 6;
             legGroupSize = 2;
-            rippleScale = 0.5f;
+            rippleScale = 0.25f;
 
             legLength = 10;
             legExtension = -1.5f;
@@ -236,17 +236,17 @@ public class SCUnitTypes {
             groundLayer = Layer.legUnit - 1f;
 
             abilities.add(
-                    new RepairFieldAbility(35f, 60f, 40){{
-                        sameTypeHealMult = 0.3f;
-                        maxTargets = 4;
+                new RepairFieldAbility(35f, 60f, 40){{
+                    sameTypeHealMult = 0.3f;
+                    maxTargets = 4;
 
-                        smartHeal = true;
-                        smartDowntime = 60 * 4.5f;
-                    }}
+                    smartHeal = true;
+                    smartDowntime = 60 * 4.5f;
+                }}
             );
 
             weapons.addAll(
-                    new Weapon("baby-mint-weapon"){{
+                    new Weapon(){{
                         mirror = true;
                         alternate = false;
                         showStatSprite = false;
@@ -312,6 +312,223 @@ public class SCUnitTypes {
             );
         }};
 
+        broodfather = new SCCreatureUnitType("broodfather"){{
+            controller = unit -> {
+                if(unit.team != Vars.state.rules.defaultTeam){
+                    return new CreatureAI();
+                }
+                return new CommandAI();
+            };
+            constructor = LegsUnit::create;
+
+            //Stat
+            health = 850f;
+            armor = 20f;
+
+            speed = 0.6f;
+            accel = 0.08f;
+            drag = 0.07f;
+
+            hitSize = 18;
+            rotateSpeed = 4;
+
+            buildSpeed = 3.5f;
+
+            //Behavior
+            creatureFamily = "pepper";
+            alertRadius = 32f * 8f;
+
+            terrainWalk = true;
+
+            fleeHealthThresh = 850f / 2.5f;
+
+            strafeAngle = 90f;
+            strafeOffs = 3f * 8f;
+            strafeTimeMin = 0.5f * 60f;
+
+            wanderTimeMin = 3f * 60f;
+            wanderTimeMax = 8f * 60f;
+            wanderRange = 150f;
+
+            shouldChase = false;
+
+            builderBlocks.addAll(
+                    SCPayloadBlocks.smallPeppermintNest
+            );
+
+            //Visual
+            drawCell = false;
+            outlineColor = CandyPal.greenMintOutline;
+            buildBeamOffset = 13f;
+
+            legCount = 6;
+            legGroupSize = 2;
+            rippleScale = 0.4f;
+
+            legLength = 22f;
+            legExtension = -4f;
+            legBaseOffset = 6.5f;
+            legLengthScl = 0.95f;
+            legForwardScl = 2.5f;
+            legMoveSpace = 0.7f;
+            legMaxLength = 1.2f;
+            legMinLength = 0.8f;
+            legSplashDamage = 30f;
+            legSplashRange = 4f * 8f;
+            legStraightness = -0.2f;
+
+            lockLegBase = true;
+            legContinuousMove = true;
+
+            stepShake = 0.35f;
+            stepSound = Sounds.walkerStepSmall;
+            stepSoundVolume = 0.6f;
+
+            shadowElevation = 0.33f;
+            hovering = true;
+
+            groundLayer = Layer.legUnit;
+
+            parts.add(
+                new RegionPart("-fang"){{
+                    layerOffset = -0.001f;
+                    mirror = true;
+
+                    y = 4f;
+
+                    moveRot = -8f;
+                    progress = p -> Mathf.absin(Time.time + 20f, 20f, 1f);
+
+                    moves.add(new PartMove(p -> Mathf.absin(Time.time + 25f, 30f, 1f), 0f, -1.3f, 0f));
+                }}
+            );
+
+            abilities.add(
+                new SCDeathAlertAbility(150f * 8f, SCSounds.broodfather, 1.7f){{
+                    alertStatus = SCStatusEffects.enraged;
+                    alertStatusDuration = 6f * 60f;
+                    alertEffect = new WaveEffect(){{
+                        colorFrom = colorTo = CandyPal.greenMint;
+                        lifetime = 90f;
+                        sizeFrom = 10f;
+                        sizeTo = 150f * 8f;
+                        strokeFrom = 20f;
+                        strokeTo = 8f;
+                        interp = Interp.exp5Out;
+                    }};
+                    alertShake = 2.5f;
+                }}
+            );
+
+            weapons.addAll(
+                new Weapon(){{
+                    mirror = false;
+                    showStatSprite = false;
+
+                    x = 0f;
+                    y = 5f;
+
+                    shootCone = 45;
+                    inaccuracy = 4f;
+
+                    reload = 15f;
+                    cooldownTime = 40f;
+
+                    heatColor = CandyPal.greenMint;
+
+                    shootSound = SCSounds.shootPepper;
+                    shootSoundVolume = 0.4f;
+
+                    shootStatus = SCStatusEffects.speedy;
+                    shootStatusDuration = reload + 120f;
+
+                    bullet = new BasicBulletType(){{
+                        shootEffect = Fx.sparkShoot;
+                        smokeEffect = Fx.none;
+                        hitEffect = despawnEffect = new ExplosionEffect(){{
+                            lifetime = 20f;
+                            waveStroke = 0f;
+                            waveRad = 0f;
+                            smokeSize = 0f;
+
+                            sparks = 5;
+                            sparkRad = 23f;
+                            sparkLen = 8f;
+                            sparkStroke = 2f;
+
+                            sparkColor = CandyPal.greenMint;
+                        }};
+
+                        hitSound = SCSounds.explosionPepper;
+                        despawnSound = SCSounds.explosionPepper;
+                        hitSoundVolume = 0.4f;
+
+                        speed = 4.5f;
+                        splashDamage = 25f;
+                        splashDamageRadius = 25f;
+
+                        lifetime = 60f;
+
+                        pierce = true;
+                        pierceCap = 2;
+
+                        width = 6f;
+                        height = 8f;
+
+                        lightColor = hitColor = CandyPal.greenMint;
+                        frontColor = Color.white;
+
+                        trailWidth = 1.5f;
+                        trailLength = 12;
+                        trailColor = lightColor;
+
+                        shrinkY = 0f;
+                        shrinkX = 0f;
+
+                        fragBullets = 3;
+                        fragRandomSpread = 360f;
+                        fragLifeMin = 0.9f;
+                        fragBullet = new BasicBulletType(){{
+                            shootEffect = Fx.sparkShoot;
+                            smokeEffect = Fx.none;
+                            hitEffect = despawnEffect = new ExplosionEffect(){{
+                                lifetime = 20f;
+                                waveStroke = 0f;
+                                waveRad = 0f;
+                                smokeSize = 0f;
+
+                                sparks = 3;
+                                sparkRad = 15f;
+                                sparkLen = 6f;
+                                sparkStroke = 1.6f;
+
+                                sparkColor = CandyPal.greenMint;
+                            }};
+                            hitSound = SCSounds.explosionPepper;
+                            despawnSound = SCSounds.explosionPepper;
+                            hitSoundVolume = 0.4f;
+
+                            speed = 3.5f;
+                            damage = 20f;
+                            lifetime = 20f;
+
+                            width = 6f;
+                            height = 8f;
+
+                            lightColor = hitColor = CandyPal.greenMint;
+                            frontColor = Color.white;
+
+                            trailWidth = 1.5f;
+                            trailLength = 12;
+                            trailColor = lightColor;
+
+                            shrinkY = 0f;
+                            shrinkX = 0f;
+                        }};
+                    }};
+                }});
+        }};
+
         sweetMother = new SCCreatureUnitType("sweet-mother"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
@@ -323,9 +540,10 @@ public class SCUnitTypes {
 
             //Stat
             health = 5000;
-            armor = 5;
+            armor = 8;
 
             speed = 2.3f;
+            accel = 0.075f;
             drag = 0.08f;
 
             hitSize = 32f;
@@ -336,12 +554,12 @@ public class SCUnitTypes {
             alertRadius = 35f * 8f;
 
             terrainWalk = true;
+            alwaysStrafe = true;
+            flee = false;
 
             strafeAngle = 90f;
             strafeDistMax = 15f * 8f;
             strafeOffs = 7f * 8f;
-            strafeTimeMin = 60f;
-            strafeTimeMax = 90f;
 
             wanderTimeMin = 90f;
             wanderTimeMax = 480;
@@ -362,7 +580,7 @@ public class SCUnitTypes {
             legExtension = -15f;
             legBaseOffset = 7.5f;
             legLengthScl = 0.95f;
-            legForwardScl = 2f;
+            legForwardScl = 1.5f;
             legMoveSpace = 0.5f;
             legStraightLength = 0.9f;
             legMaxLength = 1.2f;
@@ -381,17 +599,17 @@ public class SCUnitTypes {
             shadowElevation = 1f;
             hovering = true;
 
-            groundLayer = Layer.legUnit;
+            groundLayer = Layer.legUnit + 0.5f;
             abilities.add(
                 new SCSpawnDeathAbility(babyPepper, 8, 80f){{
-                    appliedEffect = SCStatusEffects.speedy;
+                    appliedEffect = SCStatusEffects.blitzing;
                     effectDuration = 360f;
 
                     faceOutwards = true;
                     randAmount = 5;
                 }},
                 new SCSpawnDeathAbility(babyMint, 5, 80f){{
-                    appliedEffect = SCStatusEffects.speedy;
+                    appliedEffect = SCStatusEffects.blitzing;
                     effectDuration = 360f;
 
                     faceOutwards = true;

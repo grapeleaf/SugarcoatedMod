@@ -66,7 +66,6 @@ public class SugarcoatedMod extends Mod{
     @Override
     public void loadContent(){
         SCSounds.load();
-
         SCStatusEffects.load();
 
         SCItems.load();

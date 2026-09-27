@@ -1,6 +1,8 @@
 package sugarcoated.content.type.unit;
 
+import arc.struct.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 public class SCCreatureUnitType extends SCUnitType {
     /** What family this creature belongs to */
@@ -20,7 +22,9 @@ public class SCCreatureUnitType extends SCUnitType {
 
     //strafing
     /** Whether this unit should strafe around targets when attacking*/
-    public boolean strafeTarget = true;
+    public boolean strafeTarget = true,
+    /** If true, this creature will always strafe after reaching its desired position*/
+    alwaysStrafe = false;
     /** Min strafe time */
     public float strafeTimeMin = 30f,
     /** Max strafe time */
@@ -47,6 +51,15 @@ public class SCCreatureUnitType extends SCUnitType {
     wanderRange = 100f,
     /** Max distance from home until this creature wants to return */
     homeReturnRange = 200f;
+
+    //BUILDER CREATURES
+    /** Blocks this creature is allowed to build*/
+    public ObjectSet<Block> builderBlocks = new ObjectSet<>();
+    /** Maximum number of nests this creature can build before expanding*/
+    public int nestCap = 6;
+    /** Time in between this creature builds nests as a multiplier*/
+    public float buildTimerMult = 1f;
+
 
     public SCCreatureUnitType(String name) {
         super(name);
