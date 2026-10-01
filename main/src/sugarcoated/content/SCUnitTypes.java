@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.Vars;
+import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -32,7 +33,7 @@ import static mindustry.content.Fx.v;
 public class SCUnitTypes {
 
     //Peppermint Family
-    public static UnitType babyPepper, babyMint, broodfather, sweetMother;
+    public static SCCreatureUnitType babyPepper, babyMint, broodfather, sweetMother;
 
     public static void load(){
         babyPepper = new SCCreatureUnitType("baby-pepper"){{
@@ -315,7 +316,7 @@ public class SCUnitTypes {
         broodfather = new SCCreatureUnitType("broodfather"){{
             controller = unit -> {
                 if(unit.team != Vars.state.rules.defaultTeam){
-                    return new CreatureAI();
+                    return new BuilderCreatureAI();
                 }
                 return new CommandAI();
             };
@@ -332,7 +333,8 @@ public class SCUnitTypes {
             hitSize = 18;
             rotateSpeed = 4;
 
-            buildSpeed = 3.5f;
+            buildSpeed = 1f;
+            buildRange = 120f;
 
             //Behavior
             creatureFamily = "pepper";
@@ -350,11 +352,9 @@ public class SCUnitTypes {
             wanderTimeMax = 8f * 60f;
             wanderRange = 150f;
 
-            shouldChase = false;
+            homeReturnRange = 128f;
 
-            builderBlocks.addAll(
-                    SCPayloadBlocks.smallPeppermintNest
-            );
+            shouldChase = false;
 
             //Visual
             drawCell = false;
@@ -557,7 +557,7 @@ public class SCUnitTypes {
             alwaysStrafe = true;
             flee = false;
 
-            strafeAngle = 90f;
+            strafeAngle = 360f;
             strafeDistMax = 15f * 8f;
             strafeOffs = 7f * 8f;
 
@@ -843,5 +843,9 @@ public class SCUnitTypes {
                 }}
             );
         }};
+    }
+
+    public static void init(){
+        broodfather.builderBlocks.add(SCPayloadBlocks.smallPeppermintNest);
     }
 }

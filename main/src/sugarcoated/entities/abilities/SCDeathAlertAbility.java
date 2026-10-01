@@ -1,17 +1,18 @@
 package sugarcoated.entities.abilities;
 
+import arc.*;
 import arc.audio.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
-import mindustry.type.StatusEffect;
-import mindustry.type.UnitType;
-import sugarcoated.ai.CreatureAI;
-import sugarcoated.content.type.unit.SCCreatureUnitType;
+import mindustry.type.*;
+import sugarcoated.ai.*;
+import sugarcoated.content.type.unit.*;
 
 public class SCDeathAlertAbility extends Ability {
     public Sound alertSound = Sounds.none;
@@ -36,8 +37,17 @@ public class SCDeathAlertAbility extends Ability {
         this.alertSoundVolume = volume;
     }
 
-    public SCDeathAlertAbility(float range){
-        this.range = range;
+    @Override
+    public void addStats(Table t) {
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / Vars.tilesize, 2)));
+        t.row();
+        if(triggerIfAlone){
+            t.add(Core.bundle.get("stat.sc-deathalert-alonetrigger"));
+            t.row();
+        }
+        t.add(Core.bundle.get("stat.sc-ally-status-effect")+
+            " [stat]"+alertStatus.localizedName+"[lightgray] ~ [stat]"+((int)(alertStatusDuration / 60f)) + " [lightgray]"+Core.bundle.get("unit.seconds"));
     }
 
     @Override

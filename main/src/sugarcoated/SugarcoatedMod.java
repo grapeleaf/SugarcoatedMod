@@ -1,19 +1,17 @@
 package sugarcoated;
 
 import arc.*;
+import mindustry.*;
 import mindustry.ctype.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.mod.*;
 import sugarcoated.ai.CreatureAI;
 import sugarcoated.annotations.Annotations.*;
-import sugarcoated.content.SCBlocks;
-import sugarcoated.content.SCItems;
-import sugarcoated.content.SCStatusEffects;
-import sugarcoated.content.SCUnitTypes;
+import sugarcoated.content.*;
 import sugarcoated.gen.*;
 
+import static arc.Core.app;
 import static mindustry.Vars.*;
 
 /**
@@ -37,10 +35,6 @@ public class SugarcoatedMod extends Mod{
     public SugarcoatedMod(boolean tools){
         SugarcoatedMod.tools = tools;
 
-        if(!headless){
-            Events.on(FileTreeInitEvent.class, e -> Core.app.post(SCSounds::load));
-        }
-
         Events.run(Trigger.postDraw, () -> {
             if(!CreatureAI.debugView || headless) return;
 
@@ -61,18 +55,28 @@ public class SugarcoatedMod extends Mod{
                 });
             }
         });
+
+        Events.on(FileTreeInitEvent.class, e -> {
+            if(!headless) app.post(SCShaders::load);
+        });
+
+        Events.on(DisposeEvent.class, e -> {
+            if(!headless) SCShaders.dispose();
+        });
     }
 
     @Override
     public void loadContent(){
         SCSounds.load();
+        SCCacheLayer.load();
+
         SCStatusEffects.load();
 
         SCItems.load();
         SCUnitTypes.load();
 
         SCBlocks.load();
-
+        SCUnitTypes.init();
         //below has to be done after all things are loaded.
         SCEntityMapping.init();
     }

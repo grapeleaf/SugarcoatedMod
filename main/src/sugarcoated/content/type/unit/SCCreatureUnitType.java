@@ -34,7 +34,9 @@ public class SCCreatureUnitType extends SCUnitType {
     /** Max strafing distance for this creature, can be overridden by setting a value of >0*/
     strafeDistMax = -1f,
     /** Strafe offset for this creature (e.g. if this is 24, creature can randomly move 4 tiles closer to the target)*/
-    strafeOffs = 24f;
+    strafeOffs = 24f,
+    /** This creature will strafe more cautiously when health drops below max health / cautiousStrafeThresh*/
+    cautiousStrafeThresh = 2f;
 
     //fleeing
     /** Determines whether this creature flees on low health or not*/

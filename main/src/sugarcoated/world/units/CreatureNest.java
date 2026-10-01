@@ -7,26 +7,23 @@ import mindustry.entities.units.*;
 import mindustry.graphics.*;
 import mindustry.world.blocks.units.*;
 import sugarcoated.CandyPal;
+import sugarcoated.world.blocks.CreatureBuilding;
 
 public class CreatureNest extends UnitFactory {
     public TextureRegion underRegion;
     /** Minimum distance between other nests. This is only used for builder creatures*/
     public float nestRangeLimit = -1f;
+    public String creatureFamily = "none";
 
     public CreatureNest(String name) {
         super(name);
     }
 
     @Override
-    public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
-        super.drawPlanRegion(plan, list);
-    }
-
-    @Override
     public void init(){
         super.init();
         if(nestRangeLimit <= 0){
-            nestRangeLimit = (size * 2) * 8;
+            nestRangeLimit = (size * 2f) * 8f;
         }
     }
 
@@ -36,7 +33,22 @@ public class CreatureNest extends UnitFactory {
         underRegion = findFactoryRegion("-under");
     }
 
-    public class CreatureNestBuild extends UnitFactoryBuild {
+    public class CreatureNestBuild extends UnitFactoryBuild implements CreatureBuilding {
+        public String family = "none";
+
+        @Override
+        public String getFamily(){
+            return family;
+        }
+
+        @Override
+        public void setFamily(String family){}
+
+        @Override
+        public void created() {
+            super.created();
+            family = (Vars.player != null && team == Vars.player.team()) ? "none" : creatureFamily;
+        }
 
         @Override
         public void draw(){

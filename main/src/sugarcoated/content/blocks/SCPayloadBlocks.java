@@ -12,14 +12,19 @@ public class SCPayloadBlocks {
     public static Block
     //Nests
     smallPeppermintNest;
+
     public static void load(){
         smallPeppermintNest = new CreatureNest("peppermint-nest-small"){{
             requirements(Category.units, with(Items.copper, 20, Items.lead, 20));
+            buildTime = 3f * 60f;
             size = 3;
             plans.add(
                 new UnitPlan(SCUnitTypes.babyPepper, 20f * 60f, with(Items.copper, 20, Items.lead, 20)),
                 new UnitPlan(SCUnitTypes.babyMint, 25f * 60f, with(Items.copper, 20, Items.lead, 20))
             );
+            creatureFamily = "pepper";
+            squareSprite = false;
+            drawTeamOverlay = false;
         }};
     }
 }

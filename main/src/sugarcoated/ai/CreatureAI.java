@@ -31,7 +31,7 @@ public class CreatureAI extends CommandAI {
     protected SCCreatureUnitType type;
 
     //DEBUG
-    public static boolean debugView = false;
+    public static boolean debugView = true;
     @SuppressWarnings("unchecked")
     protected final Seq<Prov<String>> debugText = Seq.with(
             () -> "CurrentState: " + stateHandler.currentState,
@@ -48,7 +48,6 @@ public class CreatureAI extends CommandAI {
 
         stateHandler = new CreatureStateHandler(this);
         type = (SCCreatureUnitType)unit.type;
-        home = null;
 
         wanderTimer = 0f;
         strafeTimer = 0f;
@@ -56,18 +55,11 @@ public class CreatureAI extends CommandAI {
         investigateTimer = 0f;
     }
 
-//    @Override
-//    public void unit(Unit unit){
-//        super.unit(unit);
-//
-//    }
-
     @Override
     public void updateUnit(){
         if(home == null){
             home = new Vec2(unit.x, unit.y);
         }
-
         //remove invalid combat target
         if(combatTarget != null && combatTarget instanceof Healthc h && !h.isValid()){
             combatTarget = null;
@@ -278,9 +270,6 @@ public class CreatureAI extends CommandAI {
         commandPosition(home);
     }
 
-    protected void setHome(Vec2 pos){
-        home.set(pos);
-    }
     protected void setHome(float x, float y){
         home.set(x, y);
     }
@@ -291,7 +280,7 @@ public class CreatureAI extends CommandAI {
     }
 
     protected boolean withinHome(){
-        return home != null && unit.within(home, type.wanderRange);
+        return home != null && unit.within(home, type.homeReturnRange);
     }
 
     protected boolean inStrafeRange(){
@@ -306,21 +295,14 @@ public class CreatureAI extends CommandAI {
         strafeTimer -= Time.delta;
 
         if(strafeTimer <= 0f){
-            float angle = combatTarget.angleTo(unit) + Mathf.range(type.strafeAngle);
             float distance = (type.strafeDistMax - 10f) - Mathf.random(type.strafeOffs);
             float maxDistance = type.range - 5f;
+            float angle = (unit.health() <= type.health / 2f) ? combatTarget.angleTo(unit) + 45f : combatTarget.angleTo(unit) + Mathf.range(type.strafeAngle);
+            float strafeDistance = unit.health() <= type.health / 2f ? maxDistance : distance;
 
-            if(type.alwaysStrafe && unit.within(strafeTarget, 8f * (type.hitSize / 8))){
-                strafeTimer = 0;
-            } else {
-                strafeTimer = Mathf.random(type.strafeTimeMin, type.strafeTimeMax);
-            }
+            strafeTimer = (type.alwaysStrafe && unit.within(strafeTarget, 8f * (type.hitSize / 8))) ? 0f : Mathf.random(type.strafeTimeMin, type.strafeTimeMax);
 
-            if(unit.health() <= type.health / 2f){
-                strafeTarget.set(combatTarget.x() + Mathf.cosDeg(angle) * maxDistance, combatTarget.y() + Mathf.sinDeg(angle) * maxDistance);
-            } else {
-                strafeTarget.set(combatTarget.x() + Mathf.cosDeg(angle) * distance, combatTarget.y() + Mathf.sinDeg(angle) * distance);
-            }
+            strafeTarget.set(combatTarget.x() + Mathf.cosDeg(angle) * strafeDistance, combatTarget.y() + Mathf.sinDeg(angle) * strafeDistance);
 
             if(targetPos == null){
                 targetPos = new Vec2();
@@ -329,12 +311,13 @@ public class CreatureAI extends CommandAI {
         }
     }
 
+    //todo: improve this
     protected void wander(Vec2 pos){
         wanderTimer -= Time.delta;
 
         if(wanderTimer <= 0f){
             float angle = Mathf.random(360f);
-            float distance = Mathf.random(type.wanderRange);
+            float distance = Mathf.random(type.wanderRange + type.homeReturnRange);
 
             wanderTimer = Mathf.random(type.wanderTimeMin, type.wanderTimeMax);
             wanderTarget.set(
@@ -390,7 +373,6 @@ public class CreatureAI extends CommandAI {
             Drawf.circles(home.getX(), home.getY(), 5f, Color.green);
             Drawf.dashCircle(home.getX(), home.getY(), type.homeReturnRange, Color.green);
             Drawf.text("HOME", home.getX(), home.getY() + textMargin, Color.green);
-
         }
 
         //text

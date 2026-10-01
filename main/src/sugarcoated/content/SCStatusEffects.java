@@ -1,5 +1,6 @@
 package sugarcoated.content;
 
+import arc.graphics.*;
 import mindustry.content.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -19,10 +20,12 @@ public class SCStatusEffects {
         speedy = new StatusEffect("speedy"){{
             color = CandyPal.greenMint;
             speedMultiplier = 2.3f;
+
+            init(() -> opposite(StatusEffects.slow));
         }};
 
         blitzing = new StatusEffect("blitzing"){{
-            color = CandyPal.redMint;
+            color = Color.white;
             speedMultiplier = 3f;
 
             init(() -> opposite(StatusEffects.unmoving));
